@@ -3,13 +3,6 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/session";
 import { getLastInteractions } from "@/lib/books";
 
-
-import { BrowserRouter } from "react-router-dom";
-
-<BrowserRouter basename="/ma-boite-a-livre">
-</BrowserRouter>
-
-
 export default function Home() {
   const [user, setUser] = useState(null);
 
