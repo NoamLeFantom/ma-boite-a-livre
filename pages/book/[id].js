@@ -1,42 +1,50 @@
-// pages/book/[id].js
-
-import { useRouter } from "next/router";
-import { getBookById, addInteraction, addComment } from "@/lib/data";
-import { getCurrentUser } from "@/lib/session";
-import { useState } from "react";
-import Header from "@/components/Header";
-
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import MapWithBookBoxes from '@/components/MapWithBookBoxes';
+import { getBookById } from '@/lib/data';
+import { getCurrentUser } from '@/lib/session';
+import Header from '@/components/Header';
 
 export default function BookPage() {
   const router = useRouter();
   const { id } = router.query;
-
   const book = getBookById(id);
   const user = getCurrentUser();
   const pseudo = user?.pseudo || "inconnu";
 
-  const [location, setLocation] = useState("");
-  const [comment, setComment] = useState("");
+  const [userPosition, setUserPosition] = useState(null);
+  const [selectedBox, setSelectedBox] = useState(null);
+
+  const handleLocationSuccess = (position) => {
+    setUserPosition({
+      lat: position.coords.latitude,
+      lon: position.coords.longitude,
+    });
+  };
+
+  const handleLocationError = (error) => {
+    console.error("Erreur de géolocalisation:", error);
+  };
+
+  const handleSelectBox = (box) => {
+    setSelectedBox(box);
+  };
+
+  const handleValidateSelection = (box) => {
+    alert(`Vous avez sélectionné la boîte à livre : ${box.name}`);
+    // Logic to proceed with the selection (e.g., update database or navigate)
+  };
 
   if (!book) return <p>Livre introuvable.</p>;
 
-  const handleInteraction = (action) => {
-    if (!location) return alert("Spécifie un lieu.");
-    addInteraction(id, { action, location, pseudo });
-    setLocation("");
-    router.replace(router.asPath); // force refresh
-  };
-
-  const handleAddComment = () => {
-    if (!comment) return alert("Ton commentaire est vide.");
-    addComment(id, { pseudo, message: comment });
-    setComment("");
-    router.replace(router.asPath);
-  };
+  // Demander la géolocalisation de l'utilisateur
+  if (typeof window !== 'undefined' && !userPosition) {
+    navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError);
+  }
 
   return (
     <div style={{ padding: 20 }}>
-      <Header/>
+      <Header />
       <h1>{book.title}</h1>
       <p><strong>Auteur:</strong> {book.author}</p>
       <p><strong>ISBN:</strong> {book.isbn}</p>
@@ -44,53 +52,12 @@ export default function BookPage() {
 
       <hr />
 
-      <h2>Actions</h2>
-      <input
-        type="text"
-        placeholder="Lieu (ex: Paris)"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
+      <h2>Carte des boîtes à livres</h2>
+      <MapWithBookBoxes
+        userPosition={userPosition}
+        onSelectBox={handleSelectBox}
+        onValidateSelection={handleValidateSelection}
       />
-      <button onClick={() => handleInteraction("pris")}>📖 Pris</button>
-      <button onClick={() => handleInteraction("déposé")}>📚 Déposé</button>
-
-      <hr />
-
-      <h2>Historique</h2>
-      {book.history.length === 0 ? (
-        <p>Aucune interaction.</p>
-      ) : (
-        <ul>
-          {book.history.map((h, i) => (
-            <li key={i}>
-              {h.date} – {h.pseudo} a {h.action} le livre à {h.location}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <hr />
-
-      <h2>Commentaires</h2>
-      <textarea
-        placeholder="Ton message"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        rows={3}
-        cols={40}
-      />
-      <br />
-      <button onClick={handleAddComment}>💬 Ajouter un commentaire</button>
-
-      {book.comments.length > 0 && (
-        <ul>
-          {book.comments.map((c, i) => (
-            <li key={i}>
-              <strong>{c.pseudo}</strong> ({c.date}) : {c.message}
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }
