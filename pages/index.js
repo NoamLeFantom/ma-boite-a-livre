@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/session";
 import { getLastInteractions } from "@/lib/books";
 
+
 export default function Home() {
   const [user, setUser] = useState(null);
 
@@ -28,7 +29,7 @@ export default function Home() {
         </>
       ) : (
         <>
-          <p>Tu n&#39es pas connecté.</p>
+          <p>Tu n'es pas connecté.</p>
           <Link href="/login"><button>Se connecter</button></Link>
           <br /><br />
           <Link href="/signup"><button>Créer un compte</button></Link>

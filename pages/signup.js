@@ -25,7 +25,7 @@ export default function SignupPage() {
         value={pseudo}
         onChange={(e) => setPseudo(e.target.value)}
       />
-      <button onClick={handleSignup}>S&#39inscrire</button>
+      <button onClick={handleSignup}>S'inscrire</button>
     </div>
   );
 }
