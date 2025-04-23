@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { getBookById, addInteraction, addComment } from "@/lib/data";
 import { getCurrentUser } from "@/lib/session";
 import { useState } from "react";
+import Header from "@/components/Header";
+
 
 export default function BookPage() {
   const router = useRouter();
@@ -34,6 +36,7 @@ export default function BookPage() {
 
   return (
     <div style={{ padding: 20 }}>
+      <Header/>
       <h1>{book.title}</h1>
       <p><strong>Auteur:</strong> {book.author}</p>
       <p><strong>ISBN:</strong> {book.isbn}</p>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { books } from "@/lib/data";
+import Header from "@/components/Header";
+
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
@@ -32,6 +34,7 @@ export default function SearchPage() {
 
   return (
     <div className="p-4">
+      <Header/>
       <h1 className="text-xl font-bold mb-2">🔎 Rechercher un livre</h1>
 
       <div className="mb-4">
@@ -80,6 +83,7 @@ export default function SearchPage() {
           ))}
         </ul>
       </div>
+      <a href="/scan">scan qr code</a>
     </div>
   );
 }

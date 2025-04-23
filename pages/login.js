@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { getUser } from "@/lib/users";
+import Header from "@/components/Header";
+
 
 export default function LoginPage() {
   const [pseudo, setPseudo] = useState("");
@@ -18,6 +20,7 @@ export default function LoginPage() {
 
   return (
     <div style={{ padding: 20 }}>
+      <Header/>
       <h1>Connexion</h1>
       <input
         type="text"

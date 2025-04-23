@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/session";
 import { getLastInteractions } from "@/lib/books";
-
+import Header from "@/components/Header";
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -18,6 +18,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: 20 }}>
+      <Header />
       <Link href="/search">🔎 Rechercher un livre</Link>
 
       <h1>Bienvenue dans la BiblioLibre 📚</h1>

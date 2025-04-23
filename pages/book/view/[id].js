@@ -1,9 +1,11 @@
 // pages/book/[id].js
 
 import { useRouter } from "next/router";
-import { getBookById, addInteraction, addComment } from "@/lib/data";
+import { getBookById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/session";
 import { useState } from "react";
+
+import Header from "@/components/Header";
 
 export default function BookPage() {
   const router = useRouter();
@@ -11,14 +13,13 @@ export default function BookPage() {
 
   const book = getBookById(id);
   const user = getCurrentUser();
-  const pseudo = user?.pseudo || "inconnu";
 
-  const [comment, setComment] = useState("");
 
   if (!book) return <p>Livre introuvable.</p>;
 
   return (
     <div style={{ padding: 20 }}>
+      <Header/>
       <h1>{book.title}</h1>
       <p><strong>Auteur:</strong> {book.author}</p>
       <p><strong>ISBN:</strong> {book.isbn}</p>
