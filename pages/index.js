@@ -7,7 +7,6 @@ import { getLastInteractions } from "@/lib/books";
 import { BrowserRouter } from "react-router-dom";
 
 <BrowserRouter basename="/ma-boite-a-livre">
-  <App />
 </BrowserRouter>
 
 
