@@ -25,7 +25,7 @@ export default function QRCodeScanner({ onScan }) {
     return () => {
       scannerRef.current?.stop();
     };
-  }, []);
+  }, [onScan]);
 
   return (
     <div>
