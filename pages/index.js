@@ -21,7 +21,7 @@ export default function Home() {
       <Header />
       <Link href="/search">🔎 Rechercher un livre</Link>
 
-      <h1>Bienvenue sur ma-boite-à-livre.org 📚</h1>
+      <h1>Bienvenue dans la BiblioLibre 📚</h1>
 
       {user ? (
         <>
