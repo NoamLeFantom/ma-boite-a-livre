@@ -4,22 +4,22 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
 
-  const handleScroll = useCallback(() => {
-    requestAnimationFrame(() => {
-      setScrollState((prev) => {
-        const currentY = window.scrollY;
-        return {
-          isVisible: currentY < prev.lastY || currentY < 50,
-          lastY: currentY,
-        };
-      });
-    });
-  }, []);
+  // const handleScroll = useCallback(() => {
+  //   requestAnimationFrame(() => {
+  //     setScrollState((prev) => {
+  //       const currentY = window.scrollY;
+  //       return {
+  //         isVisible: currentY < prev.lastY || currentY < 50,
+  //         lastY: currentY,
+  //       };
+  //     });
+  //   });
+  // }, []);
 
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+  // useEffect(() => {
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, [handleScroll]);
 
   return (
     <header
