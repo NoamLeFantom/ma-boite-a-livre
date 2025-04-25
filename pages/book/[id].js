@@ -6,74 +6,6 @@ import { getCurrentUser } from "@/lib/session";
 import { useState, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 
-// More realistic mock data for book boxes
-const BOOK_BOXES = [
-  {
-    id: "1",
-    name: "Boîte à livres - Parc Central",
-    description: "Située près de l'entrée principale du parc",
-    address: "123 Avenue du Parc, 75001 Paris",
-    latitude: 48.8566,
-    longitude: 2.3522
-  },
-  {
-    id: "2",
-    name: "Boîte à livres - Place du Marché",
-    description: "À côté du kiosque à journaux",
-    address: "45 Place du Marché, 75002 Paris",
-    latitude: 48.8606,
-    longitude: 2.3376
-  },
-  {
-    id: "3",
-    name: "Boîte à livres - Bibliothèque Municipale",
-    description: "Devant l'entrée de la bibliothèque",
-    address: "78 Rue des Livres, 75003 Paris",
-    latitude: 48.8496,
-    longitude: 2.3395
-  },
-  {
-    id: "4",
-    name: "Boîte à livres - Jardin Public",
-    description: "Près de l'aire de jeux pour enfants",
-    address: "15 Rue du Jardin, 75004 Paris",
-    latitude: 48.8550,
-    longitude: 2.3450
-  },
-  {
-    id: "5",
-    name: "Boîte à livres - Café Littéraire",
-    description: "À l'extérieur du café",
-    address: "32 Boulevard des Arts, 75005 Paris",
-    latitude: 48.8580,
-    longitude: 2.3400
-  },
-  {
-    id: "6",
-    name: "Boîte à livres - Gare Centrale",
-    description: "Hall principal de la gare",
-    address: "1 Place de la Gare, 69001 Lyon",
-    latitude: 45.7600,
-    longitude: 4.8590
-  },
-  {
-    id: "7",
-    name: "Boîte à livres - Place Bellecour",
-    description: "Coin nord-est de la place",
-    address: "Place Bellecour, 69002 Lyon",
-    latitude: 45.7580,
-    longitude: 4.8320
-  },
-  {
-    id: "8",
-    name: "Boîte à livres - Vieux Lyon",
-    description: "Près de la fontaine historique",
-    address: "25 Rue Saint-Jean, 69005 Lyon",
-    latitude: 45.7620,
-    longitude: 4.8270
-  }
-];
-
 export default function BookPage() {
   const router = useRouter();
   const { id } = router.query;
@@ -91,6 +23,7 @@ export default function BookPage() {
   const [pendingAction, setPendingAction] = useState(null);
   const [selectedBookBox, setSelectedBookBox] = useState(null);
   const [showBookBoxDetails, setShowBookBoxDetails] = useState(false);
+  const [suggestedCities, setSuggestedCities] = useState([]);
 
   useEffect(() => {
     fetchBookBoxes().then(setNearbyBookBoxes).catch(console.error);
@@ -161,20 +94,27 @@ export default function BookPage() {
     setIsLoading(true);
 
     navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) => {
+      async ({ coords: { latitude, longitude } }) => {
         setUserCoords({ latitude, longitude });
         setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-        const nearby = getNearbyBookBoxes(latitude, longitude);
-        setNearbyBookBoxes(nearby);
-        setShowBookBoxes(true);
-        setIsLoading(false);
+
+        try {
+          const nearby = await fetchBookBoxes(latitude, longitude);
+          setNearbyBookBoxes(nearby);
+          setShowBookBoxes(true);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des boîtes à livres :", error);
+          alert("Une erreur s'est produite lors de la récupération des boîtes à livres.");
+        } finally {
+          setIsLoading(false);
+        }
       },
       (error) => {
         setIsLoading(false);
         alert("Erreur de géolocalisation: " + error.message);
       }
     );
-  }, [getNearbyBookBoxes]);
+  }, []);
 
   const selectBookBox = useCallback((bookBox) => {
     setLocation(bookBox.address);
@@ -223,6 +163,33 @@ export default function BookPage() {
     }
   };
 
+  const handleSearchChange = async (e) => {
+    const query = e.target.value;
+    setLocation(query);
+
+    if (query.trim().length < 3) {
+      setSuggestedCities([]);
+      return;
+    }
+
+    try {
+      const response = await geocodeCity(query);
+      if (response) {
+        setSuggestedCities([response]);
+      } else {
+        setSuggestedCities([]);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la recherche des villes :", error);
+      setSuggestedCities([]);
+    }
+  };
+
+  const handleCitySelect = (city) => {
+    setLocation(`${city.latitude}, ${city.longitude}`);
+    setSuggestedCities([]);
+  };
+
   if (!book) return <p>Livre introuvable.</p>;
 
   return (
@@ -241,9 +208,22 @@ export default function BookPage() {
           type="text"
           placeholder="Nom de la ville (ex: Paris, Lyon, etc.)"
           value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          onChange={handleSearchChange}
           style={{ marginRight: "10px", width: "250px" }}
         />
+        {suggestedCities.length > 0 && (
+          <ul style={{ listStyleType: "none", padding: 0, marginTop: "5px", border: "1px solid #ddd", borderRadius: "4px", backgroundColor: "#fff" }}>
+            {suggestedCities.map((city, index) => (
+              <li
+                key={index}
+                onClick={() => handleCitySelect(city)}
+                style={{ padding: "8px", cursor: "pointer", borderBottom: "1px solid #eee" }}
+              >
+                {city.name}
+              </li>
+            ))}
+          </ul>
+        )}
         <button
           onClick={searchBookBoxes}
           style={{ marginRight: "10px", padding: "5px 10px", backgroundColor: "#007BFF", color: "white", border: "none", borderRadius: "4px" }}
