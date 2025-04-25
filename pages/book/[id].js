@@ -5,6 +5,7 @@ import { getBookById, addInteraction, addComment, fetchBookBoxes, geocodeCity } 
 import { getCurrentUser } from "@/lib/session";
 import { useState, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
+import axios from "axios";
 
 export default function BookPage() {
   const router = useRouter();
@@ -173,12 +174,22 @@ export default function BookPage() {
     }
 
     try {
-      const response = await geocodeCity(query);
-      if (response) {
-        setSuggestedCities([response]);
-      } else {
-        setSuggestedCities([]);
-      }
+      const response = await axios.get("https://api-adresse.data.gouv.fr/search/", {
+        params: {
+          q: query,
+          limit: 5,
+        },
+      });
+
+      const features = response.data?.features || [];
+      const cities = features.map((feature) => ({
+        name: feature.properties.name,
+        city: feature.properties.city,
+        latitude: feature.geometry.coordinates[1],
+        longitude: feature.geometry.coordinates[0],
+      }));
+
+      setSuggestedCities(cities);
     } catch (error) {
       console.error("Erreur lors de la recherche des villes :", error);
       setSuggestedCities([]);
@@ -186,7 +197,7 @@ export default function BookPage() {
   };
 
   const handleCitySelect = (city) => {
-    setLocation(`${city.latitude}, ${city.longitude}`);
+    setLocation(`${city.name}, ${city.city}`);
     setSuggestedCities([]);
   };
 
@@ -219,7 +230,7 @@ export default function BookPage() {
                 onClick={() => handleCitySelect(city)}
                 style={{ padding: "8px", cursor: "pointer", borderBottom: "1px solid #eee" }}
               >
-                {city.name}
+                {city.name}, {city.city}
               </li>
             ))}
           </ul>
