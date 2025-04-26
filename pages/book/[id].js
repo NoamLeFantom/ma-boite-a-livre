@@ -53,6 +53,34 @@ export default function BookPage() {
     return bookBoxesWithDistance.sort((a, b) => a.distance - b.distance);
   }, [calculateDistance]);
 
+  const fetchAddressFromCoordinates = async (latitude, longitude) => {
+    try {
+      const response = await axios.get("https://api-adresse.data.gouv.fr/reverse/", {
+        params: {
+          lat: latitude,
+          lon: longitude,
+        },
+      });
+
+      const features = response.data?.features;
+      if (features && features.length > 0) {
+        return features[0].properties.label;
+      }
+
+      return "Adresse non disponible";
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'adresse :", error);
+      return "Erreur lors de la récupération de l'adresse";
+    }
+  };
+
+  const enhanceBookBoxWithAddress = async (bookBox) => {
+    if (!bookBox.latitude || !bookBox.longitude) return bookBox;
+
+    const address = await fetchAddressFromCoordinates(bookBox.latitude, bookBox.longitude);
+    return { ...bookBox, address };
+  };
+
   const handlePrepareInteraction = useCallback((action) => {
     if (!selectedBookBox) {
       alert("Veuillez sélectionner une boîte à livres.");
@@ -101,7 +129,8 @@ export default function BookPage() {
 
         try {
           const nearby = await fetchBookBoxes(latitude, longitude);
-          setNearbyBookBoxes(nearby);
+          const enhancedNearby = await Promise.all(nearby.map(enhanceBookBoxWithAddress));
+          setNearbyBookBoxes(enhancedNearby);
           setShowBookBoxes(true);
         } catch (error) {
           console.error("Erreur lors de la récupération des boîtes à livres :", error);
@@ -444,6 +473,20 @@ export default function BookPage() {
           ))}
         </ul>
       )}
+
+      <h2>Laisser un commentaire</h2>
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Écris ton commentaire ici..."
+        style={{ width: "100%", height: "100px", marginBottom: "10px" }}
+      ></textarea>
+      <button
+        onClick={handleAddComment}
+        style={{ padding: "10px 20px", backgroundColor: "#007BFF", color: "white", border: "none", borderRadius: "4px" }}
+      >
+        Ajouter un commentaire
+      </button>
     </div>
   )
 };

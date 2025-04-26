@@ -28,19 +28,6 @@ export default function Home() {
           <p>Connecté en tant que : <strong>{user.pseudo}</strong></p>
           <button onClick={handleLogout}>Se déconnecter</button>
           <hr style={{ margin: "30px 0" }} />
-
-          <h2>📖 Dernières interactions</h2>
-          <ul>
-            {getLastInteractions().map((entry, index) => (
-              <li key={index}>
-                <Link href={`/book/view/${entry.id}`}>
-                  <strong>{entry.title}</strong>
-                </Link>{" "}
-                — par <em>{entry.pseudo}</em> le{" "}
-                {entry.date.toLocaleDateString()}
-              </li>
-            ))}
-          </ul>
         </>
 
       ) : (
