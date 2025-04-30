@@ -1,5 +1,6 @@
 // pages/book/[id].js
 
+
 import { useRouter } from "next/router";
 import { getBookById, addInteraction, addComment, fetchBookBoxes, geocodeCity } from "@/lib/data";
 import { getCurrentUser } from "@/lib/session";
