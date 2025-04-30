@@ -1,10 +1,27 @@
 // pages/book/[id].js
 
 import { useRouter } from "next/router";
-import { getBookById, addInteraction, addComment } from "@/lib/data";
 import { getCurrentUser } from "@/lib/session";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
+import { getBookById } from "@/lib/data";
+
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+  const book = await getBookById(id);
+
+  if (!book) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      book,
+    },
+  };
+}
 
 // More realistic mock data for book boxes
 const BOOK_BOXES = [
@@ -74,11 +91,8 @@ const BOOK_BOXES = [
     }
 ];
 
-export default function BookPage() {
+export default function BookPage({ book }) {
     const router = useRouter();
-    const { id } = router.query;
-
-    const book = getBookById(id);
     const user = getCurrentUser();
     const pseudo = user?.pseudo || "inconnu";
 
@@ -165,7 +179,7 @@ export default function BookPage() {
     const handleConfirmInteraction = () => {
         if (!pendingAction || !location) return;
 
-        addInteraction(id, {
+        addInteraction(book.id, {
             action: pendingAction,
             location,
             pseudo
@@ -182,7 +196,7 @@ export default function BookPage() {
 
     const handleAddComment = () => {
         if (!comment) return alert("Ton commentaire est vide.");
-        addComment(id, { pseudo, message: comment });
+        addComment(book.id, { pseudo, message: comment });
         setComment("");
         router.replace(router.asPath);
     };

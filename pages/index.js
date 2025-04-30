@@ -1,14 +1,30 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/session";
-import { getLastInteractions } from "@/lib/books";
 import Header from "@/components/Header";
 
 export default function Home() {
   const [user, setUser] = useState(null);
+  const [interactions, setInteractions] = useState([]);
 
   useEffect(() => {
     setUser(getCurrentUser());
+  }, []);
+
+  useEffect(() => {
+    async function fetchInteractions() {
+      try {
+        const response = await fetch("/api/books");
+        if (!response.ok) {
+          throw new Error("Failed to fetch books");
+        }
+        const data = await response.json();
+        setInteractions(data);
+      } catch (error) {
+        console.error("Error fetching interactions:", error);
+      }
+    }
+    fetchInteractions();
   }, []);
 
   const handleLogout = () => {
@@ -21,7 +37,7 @@ export default function Home() {
       <Header />
       <Link href="/search">🔎 Rechercher un livre</Link>
 
-      <h1>Bienvenue dans la BiblioLibre 📚</h1>
+      <h1>Bienvenue dans Book Traveller 📚</h1>
 
       {user ? (
         <>
@@ -43,7 +59,7 @@ export default function Home() {
 
       <h2>📖 Dernières interactions</h2>
       <ul>
-        {getLastInteractions().map((entry, index) => (
+        {interactions.map((entry, index) => (
           <li key={index}>
             <Link href={`/book/view/${entry.id}`}>
               <strong>{entry.title}</strong>

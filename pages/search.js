@@ -1,40 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { books } from "@/lib/data";
 import Header from "@/components/Header";
-
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [exactMatch, setExactMatch] = useState(null);
   const [isbnMatches, setIsbnMatches] = useState([]);
+  const [books, setBooks] = useState([]);
 
-  const handleSearch = () => {
-    const q = query.toLowerCase().trim();
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch("/api/search");
+        const data = await response.json();
+        setBooks(data);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      }
+    };
 
-    // Cherche une correspondance exacte avec un identifiant unique
-    const match = books.find((book) => book.id.toLowerCase() === q);
-    setExactMatch(match || null);
+    fetchBooks();
+  }, []);
 
-    // Si match trouvé, extraire l’ISBN (avant le "-")
-    if (match) {
-      const isbnPart = match.id.split("-")[0];
-      const related = books.filter((b) => b.id.startsWith(isbnPart));
-      setIsbnMatches(related);
-    } else {
-      // Sinon, chercher tous les livres contenant ce texte dans le titre
-      const matches = books.filter(
-        (b) =>
-          b.id.toLowerCase().includes(q) ||
-          b.title.toLowerCase().includes(q)
-      );
-      setIsbnMatches(matches);
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch search results");
+      }
+      const data = await response.json();
+      setBooks(data);
+      setExactMatch(null);
+      setIsbnMatches(data);
+    } catch (error) {
+      console.error("Error during search:", error);
     }
   };
 
   return (
     <div className="p-4">
-      <Header/>
+      <Header />
       <h1 className="text-xl font-bold mb-2">🔎 Rechercher un livre</h1>
 
       <div className="mb-4">
@@ -51,6 +56,10 @@ export default function SearchPage() {
         >
           Rechercher
         </button>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-gray-500">Livres chargés : {books.length}</p>
       </div>
 
       {exactMatch && (

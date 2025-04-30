@@ -6,29 +6,53 @@ import Header from "@/components/Header";
 
 export default function LoginPage() {
   const [pseudo, setPseudo] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
   const router = useRouter();
 
-  const handleLogin = () => {
-    const user = getUser(pseudo);
-    if (!user) {
-      alert("Utilisateur introuvable");
-      return;
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: pseudo, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to log in");
+      }
+
+      localStorage.setItem("user", JSON.stringify({ username: pseudo }));
+      router.push("/");
+    } catch (err) {
+      setError(err.message);
     }
-    localStorage.setItem("user", JSON.stringify(user));
-    router.push("/");
   };
 
   return (
     <div style={{ padding: 20 }}>
       <Header/>
       <h1>Connexion</h1>
-      <input
-        type="text"
-        placeholder="Pseudo"
-        value={pseudo}
-        onChange={(e) => setPseudo(e.target.value)}
-      />
-      <button onClick={handleLogin}>Se connecter</button>
+      <form onSubmit={handleLogin}>
+        <input
+          type="text"
+          placeholder="Pseudo"
+          value={pseudo}
+          onChange={(e) => setPseudo(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Mot de passe"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button type="submit">Se connecter</button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }

@@ -3,28 +3,9 @@ import { useState, useEffect, useCallback } from "react";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-
-  // const handleScroll = useCallback(() => {
-  //   requestAnimationFrame(() => {
-  //     setScrollState((prev) => {
-  //       const currentY = window.scrollY;
-  //       return {
-  //         isVisible: currentY < prev.lastY || currentY < 50,
-  //         lastY: currentY,
-  //       };
-  //     });
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, [handleScroll]);
-
   return (
-    <header
-      className=""
-    >
+    <header>
+      <h1>Book Traveller</h1>
       <nav className="">
         <a href="/">
           <img src="/src/ui/logo-letter.png" alt="Logo du site" className="" />

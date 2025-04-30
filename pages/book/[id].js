@@ -7,11 +7,29 @@ import { useState, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 import axios from "axios";
 
-export default function BookPage() {
-  const router = useRouter();
-  const { id } = router.query;
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+  const book = await getBookById(id);
 
-  const book = getBookById(id);
+  if (!book) {
+    return {
+      notFound: true,
+    };
+  }
+
+  if (book._id) {
+    book._id = book._id.toString();
+  }
+
+  return {
+    props: {
+      book,
+    },
+  };
+}
+
+export default function BookPage({ book }) {
+  const router = useRouter();
   const user = getCurrentUser();
   const pseudo = user?.pseudo || "inconnu";
 
@@ -89,30 +107,65 @@ export default function BookPage() {
     setPendingAction(action);
   }, [selectedBookBox]);
 
-  const handleConfirmInteraction = useCallback(() => {
+  const handleConfirmInteraction = useCallback(async () => {
     if (!pendingAction || !selectedBookBox) return;
 
-    addInteraction(id, {
-      action: pendingAction,
-      location: selectedBookBox.address,
-      pseudo,
-    });
+    try {
+      const response = await fetch("/api/interaction", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: book.id,
+          action: pendingAction,
+          location: selectedBookBox.address,
+          pseudo,
+        }),
+      });
 
-    setLocation("");
-    setPendingAction(null);
-    setSelectedBookBox(null);
-    router.replace(router.asPath);
-  }, [id, pendingAction, selectedBookBox, pseudo, router]);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to confirm interaction");
+      }
 
-  const handleAddComment = useCallback(() => {
+      setLocation("");
+      setPendingAction(null);
+      setSelectedBookBox(null);
+      router.replace(router.asPath);
+    } catch (error) {
+      console.error("Error confirming interaction:", error);
+      alert("Une erreur s'est produite lors de la confirmation de l'interaction.");
+    }
+  }, [pendingAction, selectedBookBox, book.id, pseudo, router]);
+
+  const handleAddComment = useCallback(async () => {
     if (!comment.trim()) {
       alert("Ton commentaire est vide.");
       return;
     }
-    addComment(id, { pseudo, message: comment });
-    setComment("");
-    router.replace(router.asPath);
-  }, [comment, id, pseudo, router]);
+
+    try {
+      const response = await fetch("/api/comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: book.id,
+          pseudo,
+          message: comment,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add comment");
+      }
+
+      setComment("");
+      router.replace(router.asPath);
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      alert("Une erreur s'est produite lors de l'ajout du commentaire.");
+    }
+  }, [comment, book.id, pseudo, router]);
 
   const handleGetLocation = useCallback(() => {
     if (!navigator.geolocation) {

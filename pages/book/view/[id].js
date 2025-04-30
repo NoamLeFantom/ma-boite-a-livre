@@ -1,25 +1,33 @@
 // pages/book/[id].js
 
-import { useRouter } from "next/router";
 import { getBookById } from "@/lib/data";
 import { getCurrentUser } from "@/lib/session";
-import { useState } from "react";
 
 import Header from "@/components/Header";
 
-export default function BookPage() {
-  const router = useRouter();
-  const { id } = router.query;
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+  const book = await getBookById(id);
 
-  const book = getBookById(id);
+  if (!book) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      book,
+    },
+  };
+}
+
+export default function BookPage({ book }) {
   const user = getCurrentUser();
-
-
-  if (!book) return <p>Livre introuvable.</p>;
 
   return (
     <div style={{ padding: 20 }}>
-      <Header/>
+      <Header />
       <h1>{book.title}</h1>
       <p><strong>Auteur:</strong> {book.author}</p>
       <p><strong>ISBN:</strong> {book.isbn}</p>
