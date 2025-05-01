@@ -15,7 +15,11 @@ export default async function handler(req, res) {
   console.log("Received request body:", req.body);
 
   try {
-    const db = await getDb(); // Utilise directement l'objet retourné par getDb
+    const db = await getDb();
+    if (!db) {
+      console.error("Failed to connect to database");
+      return res.status(500).json({ error: "Database connection failed" });
+    }
     console.log("Connected to database");
 
     const existingUser = await db.collection("Users").findOne({ username });
@@ -28,15 +32,20 @@ export default async function handler(req, res) {
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("Password hashed successfully");
 
-    await db.collection("Users").insertOne({
+    const result = await db.collection("Users").insertOne({
       username,
       passwordHash: hashedPassword,
       email,
-      role: "user", // Add default role "user"
+      role: "user",
       createdAt: new Date(),
     });
-    console.log("User inserted successfully");
 
+    if (!result.acknowledged) {
+      console.error("Failed to insert user into database");
+      return res.status(500).json({ error: "Failed to create user" });
+    }
+
+    console.log("User inserted successfully");
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     console.error("Error in signup API:", error);
