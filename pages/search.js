@@ -20,7 +20,7 @@ export default function SearchPage() {
       const response = await fetch("/api/books", {
         method: "GET",
         headers: {
-          "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
       });
       const results = await response.json();

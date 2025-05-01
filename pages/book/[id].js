@@ -88,7 +88,7 @@ export default function BookPage({ book, initialUser }) {
           lon: longitude,
         },
         headers: {
-          "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
       });
 
@@ -128,7 +128,7 @@ export default function BookPage({ book, initialUser }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -166,7 +166,7 @@ export default function BookPage({ book, initialUser }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
         credentials: 'include',
         body: JSON.stringify({
@@ -285,7 +285,7 @@ export default function BookPage({ book, initialUser }) {
           limit: 5,
         },
         headers: {
-          "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
       });
 
