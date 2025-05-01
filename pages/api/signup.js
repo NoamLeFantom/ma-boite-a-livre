@@ -32,6 +32,7 @@ export default async function handler(req, res) {
       username,
       passwordHash: hashedPassword,
       email,
+      role: "user", // Add default role "user"
       createdAt: new Date(),
     });
     console.log("User inserted successfully");

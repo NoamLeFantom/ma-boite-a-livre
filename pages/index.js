@@ -95,7 +95,7 @@ export default function Home({ initialUser }) {
               <strong>{entry.title}</strong>
             </Link>{" "}
             — par <em>{entry.pseudo}</em> le{" "}
-            {entry.date.toLocaleDateString()}
+            {entry.date ? new Date(entry.date).toLocaleDateString() : "Date inconnue"}
           </li>
         ))}
       </ul>

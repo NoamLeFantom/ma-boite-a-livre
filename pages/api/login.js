@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     }
 
     const cookieOptions = {
-      httpOnly: true,
+      httpOnly: false, // Temporarily set to false for debugging
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
@@ -43,7 +43,9 @@ export default async function handler(req, res) {
 
     console.log("Setting cookie with options:", cookieOptions);
 
-    const cookie = serialize("user", JSON.stringify({ username }), cookieOptions);
+    console.log("User role before setting cookie:", user.role);
+
+    const cookie = serialize("user", JSON.stringify({ username, role: user.role }), cookieOptions);
 
     console.log("Login successful, setting cookie for user:", username);
 

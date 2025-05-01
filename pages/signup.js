@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { setCurrentUser } from "@/lib/session";
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
@@ -24,6 +25,14 @@ export default function SignupPage() {
         const data = await response.json();
         throw new Error(data.error || "Failed to sign up");
       }
+
+      const user = await response.json();
+      if (!user) {
+        alert("Pseudo déjà pris");
+        return;
+      }
+      setCurrentUser(user); // Automatically log in the user after signup
+      console.log("User signed up and logged in:", user);
 
       router.push("/login");
     } catch (err) {

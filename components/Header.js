@@ -1,7 +1,16 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { getCurrentUser } from "@/lib/session";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    console.log("Current user in Header:", currentUser); // Debugging log
+    setUser(currentUser);
+  }, []);
 
   return (
     <header>
@@ -27,7 +36,7 @@ const Header = () => {
                 fill="white"
               />
               <path
-                d="M30.0312 2.125C30.0312 1.34835 29.4016 0.71875 28.625 0.71875H2.375C1.59835 0.71875 0.96875 1.34835 0.96875 2.125C0.96875 2.90165 1.59835 3.53125 2.375 3.53125H28.625C29.4016 3.53125 30.0312 2.90165 30.0312 2.125Z"
+                d="M30.0312 2.125C30.0312 1.34835 29.4016 0.71875 28.625 0.71875H2.375C1.59835 0.71875 0.96875 1.34835 0.96875 2.125C0.96875 2.90165 1.59835 3.53125H28.625C29.4016 3.53125 30.0312 2.90165 30.0312 2.125Z"
                 fill="white"
               />
               <path
@@ -39,11 +48,12 @@ const Header = () => {
         </button>
 
         <nav className="">
-          <li className=""><a href="/">Accueil</a></li>
-          <li className=""><a href="/search">Rechercher</a></li>
-          <li className=""><a href="/ContactPage">Contact</a></li>
+          <li className=""><Link href="/">Accueil</Link></li>
+          <li className=""><Link href="/search">Rechercher</Link></li>
+          {user?.role === "admin" && (
+            <li className=""><Link href="/admin">Administration</Link></li>
+          )}
           <li className=""></li>
-
         </nav>
       </nav>
     </header >
