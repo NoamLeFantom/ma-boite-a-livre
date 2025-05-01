@@ -87,9 +87,6 @@ export default function BookPage({ book, initialUser }) {
           lat: latitude,
           lon: longitude,
         },
-        headers: {
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
-        },
       });
 
       const features = response.data?.features;
@@ -126,10 +123,7 @@ export default function BookPage({ book, initialUser }) {
     try {
       const response = await fetch("/api/interaction", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: 'include',
         body: JSON.stringify({
           id: book.id,
@@ -164,10 +158,7 @@ export default function BookPage({ book, initialUser }) {
     try {
       const response = await fetch("/api/comment", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: 'include',
         body: JSON.stringify({
           id: book.id,
@@ -283,9 +274,6 @@ export default function BookPage({ book, initialUser }) {
         params: {
           q: query,
           limit: 5,
-        },
-        headers: {
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
       });
 

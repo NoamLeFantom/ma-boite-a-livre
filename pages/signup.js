@@ -16,10 +16,7 @@ export default function SignupPage() {
     try {
       const response = await fetch("/api/signup", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: 'include',
         body: JSON.stringify({ username, password, email }),
       });
