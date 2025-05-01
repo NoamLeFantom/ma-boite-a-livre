@@ -7,6 +7,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const secretKey = process.env.API_SECRET_KEY;
+  const clientKey = req.headers["books-travelling"];
+
+  if (!clientKey || clientKey !== secretKey) {
+    return res.status(403).json({ error: "Forbidden: Invalid or missing header" });
+  }
+
   const { email, password } = req.body;
 
   console.log("Received login request:", { email, password });
