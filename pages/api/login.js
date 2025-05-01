@@ -7,22 +7,22 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  console.log("Received login request:", { username, password });
+  console.log("Received login request:", { email, password });
 
-  if (!username || !password) {
-    return res.status(400).json({ error: "Username and password are required" });
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" });
   }
 
   try {
     const db = await getDb();
-    const user = await db.collection("Users").findOne({ username });
+    const user = await db.collection("Users").findOne({ email });
 
     console.log("User found:", user);
 
     if (!user) {
-      return res.status(401).json({ error: "Invalid username or password" });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     console.log("Password validation result:", isPasswordValid);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ error: "Invalid username or password" });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     const cookieOptions = {
@@ -45,9 +45,9 @@ export default async function handler(req, res) {
 
     console.log("User role before setting cookie:", user.role);
 
-    const cookie = serialize("user", JSON.stringify({ username, role: user.role }), cookieOptions);
+    const cookie = serialize("user", JSON.stringify({ username: user.username, role: user.role }), cookieOptions);
 
-    console.log("Login successful, setting cookie for user:", username);
+    console.log("Login successful, setting cookie for user:", email);
 
     res.setHeader("Set-Cookie", cookie);
     res.status(200).json({ message: "Login successful" });

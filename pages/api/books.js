@@ -13,15 +13,37 @@ export default async function handler(req, res) {
       res.status(500).json({ error: "Failed to fetch books" });
     }
   } else if (req.method === "POST") {
-    const { title, author, isbn } = req.body;
+    const { title, author, isbn, history, comments, literaryMovement } = req.body;
 
     if (!title || !author || !isbn) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     try {
-      const result = await db.collection("BookData").insertOne({ title, author, isbn });
-      res.status(201).json(result.ops[0]);
+      const existingBooks = await db.collection("BookData").find({ isbn }).toArray();
+      const count = existingBooks.length;
+      const id = `${isbn}-${String(count + 1).padStart(4, '0')}`;
+
+      const result = await db.collection("BookData").insertOne({
+        id,
+        title,
+        author,
+        isbn,
+        history: history || [],
+        comments: comments || "",
+        literaryMovement: literaryMovement || "",
+      });
+
+      res.status(201).json({
+        _id: result.insertedId,
+        id,
+        title,
+        author,
+        isbn,
+        history,
+        comments,
+        literaryMovement,
+      });
     } catch (error) {
       console.error("Error adding book:", error);
       res.status(500).json({ error: "Failed to add book" });

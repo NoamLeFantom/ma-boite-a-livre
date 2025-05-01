@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { getUser } from "@/lib/users";
 import Header from "@/components/Header";
 import { setCurrentUser } from "@/lib/session";
 
 export default function LoginPage() {
-  const [pseudo, setPseudo] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const router = useRouter();
@@ -18,16 +17,29 @@ export default function LoginPage() {
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: 'include',
-        body: JSON.stringify({ username: pseudo, password }),
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to log in");
+        throw new Error(data.error || "Échec de la connexion");
       }
 
-      setCurrentUser({ username: pseudo }); // Store user in cookies
+      // On lit les cookies pour récupérer les infos de l'utilisateur
+      const userCookie = document.cookie
+        .split("; ")
+        .find(row => row.startsWith("user="));
+
+      if (userCookie) {
+        const user = JSON.parse(decodeURIComponent(userCookie.split("=")[1]));
+        setCurrentUser(user); // optionnel, selon ton système de session
+        if (user.role === "admin") {
+          alert("Bienvenue Admin !");
+        }
+      }
+
       router.push("/");
     } catch (err) {
       setError(err.message);
@@ -36,20 +48,22 @@ export default function LoginPage() {
 
   return (
     <div style={{ padding: 20 }}>
-      <Header/>
+      <Header />
       <h1>Connexion</h1>
       <form onSubmit={handleLogin}>
         <input
-          type="text"
-          placeholder="Pseudo"
-          value={pseudo}
-          onChange={(e) => setPseudo(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
           type="password"
           placeholder="Mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit">Se connecter</button>
       </form>

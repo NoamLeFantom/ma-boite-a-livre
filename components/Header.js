@@ -1,25 +1,26 @@
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    console.log("Current user in Header:", currentUser); // Debugging log
-    setUser(currentUser);
+    const user = getCurrentUser();
+    if (user?.role) {
+      setUserRole(user.role);
+    }
   }, []);
 
   return (
     <header>
       <h1>Book Traveller</h1>
-      <nav className="">
+      <nav>
         <a href="/">
-          <img src="/src/ui/logo-letter.png" alt="Logo du site" className="" />
+          <img src="/src/ui/logo-letter.png" alt="Logo du site" />
         </a>
-        <button className="" aria-label="Menu">
+
+        <button onClick={() => setIsOpen(!isOpen)} aria-label="Menu">
           {isOpen ? (
             <svg width="25" height="27" xmlns="http://www.w3.org/2000/svg">
               <line x1="1.25" y1="-1.25" x2="32.8092" y2="-1.25"
@@ -36,7 +37,7 @@ const Header = () => {
                 fill="white"
               />
               <path
-                d="M30.0312 2.125C30.0312 1.34835 29.4016 0.71875 28.625 0.71875H2.375C1.59835 0.71875 0.96875 1.34835 0.96875 2.125C0.96875 2.90165 1.59835 3.53125H28.625C29.4016 3.53125 30.0312 2.90165 30.0312 2.125Z"
+                d="M30.0312 2.125C30.0312 1.34835 29.4016 0.71875 28.625 0.71875H2.375C1.59835 0.71875 0.96875 1.34835 0.96875 2.125C0.96875 2.90165 1.59835 3.53125 2.375 3.53125H28.625C29.4016 3.53125 30.0312 2.90165 30.0312 2.125Z"
                 fill="white"
               />
               <path
@@ -47,16 +48,16 @@ const Header = () => {
           )}
         </button>
 
-        <nav className="">
-          <li className=""><Link href="/">Accueil</Link></li>
-          <li className=""><Link href="/search">Rechercher</Link></li>
-          {user?.role === "admin" && (
-            <li className=""><Link href="/admin">Administration</Link></li>
+        <nav>
+          <li><a href="/">Accueil</a></li>
+          <li><a href="/search">Rechercher</a></li>
+          <li><a href="/ContactPage">Contact</a></li>
+          {userRole === "admin" && (
+            <li><a href="/admin">Admin</a></li>
           )}
-          <li className=""></li>
         </nav>
       </nav>
-    </header >
+    </header>
   );
 };
 

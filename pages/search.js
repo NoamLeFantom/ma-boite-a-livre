@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 
@@ -6,34 +6,42 @@ export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [exactMatch, setExactMatch] = useState(null);
   const [isbnMatches, setIsbnMatches] = useState([]);
-  const [books, setBooks] = useState([]);
-
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await fetch("/api/search");
-        const data = await response.json();
-        setBooks(data);
-      } catch (error) {
-        console.error("Error fetching books:", error);
-      }
-    };
-
-    fetchBooks();
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = async () => {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return;
+
+    setLoading(true);
+    setExactMatch(null);
+    setIsbnMatches([]);
+
     try {
-      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch search results");
+      const response = await fetch(`/api/search?query=${encodeURIComponent(trimmedQuery)}`);
+      const results = await response.json();
+
+      if (!Array.isArray(results)) {
+        console.error("Résultat inattendu :", results);
+        return;
       }
-      const data = await response.json();
-      setBooks(data);
-      setExactMatch(null);
-      setIsbnMatches(data);
-    } catch (error) {
-      console.error("Error during search:", error);
+
+      // Match exact sur l'ID
+      const match = results.find((book) => book.id?.toLowerCase() === trimmedQuery.toLowerCase());
+      setExactMatch(match || null);
+
+      if (match) {
+        // Autres exemplaires du même livre (par racine ISBN)
+        const isbnPart = match.id.split("-")[0];
+        const related = results.filter((b) => b.id.startsWith(isbnPart));
+        setIsbnMatches(related);
+      } else {
+        setIsbnMatches(results); // Affiche tous les résultats trouvés
+      }
+
+    } catch (err) {
+      console.error("Erreur lors de la recherche :", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,12 +62,8 @@ export default function SearchPage() {
           onClick={handleSearch}
           className="bg-blue-500 text-white px-4 py-2 rounded"
         >
-          Rechercher
+          {loading ? "Recherche..." : "Rechercher"}
         </button>
-      </div>
-
-      <div className="mb-4">
-        <p className="text-gray-500">Livres chargés : {books.length}</p>
       </div>
 
       {exactMatch && (
@@ -78,7 +82,7 @@ export default function SearchPage() {
           📚 {exactMatch ? "Autres exemplaires du même livre" : "Résultats"}
         </h2>
 
-        {isbnMatches.length === 0 && query && (
+        {isbnMatches.length === 0 && query && !loading && (
           <p className="text-gray-500">Aucun résultat trouvé.</p>
         )}
 
@@ -92,7 +96,10 @@ export default function SearchPage() {
           ))}
         </ul>
       </div>
-      <a href="/scan">scan qr code</a>
+
+      <div className="mt-6">
+        <a href="/scan" className="text-blue-600 underline">📷 Scanner un QR Code</a>
+      </div>
     </div>
   );
 }
