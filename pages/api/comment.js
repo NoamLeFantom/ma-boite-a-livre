@@ -1,14 +1,29 @@
 import { getDb } from "@/lib/mongodb";
+import { parse } from "cookie";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { id, pseudo, message } = req.body;
+  const { id, pseudo: initialPseudo, message } = req.body;
+  let pseudo = initialPseudo;
 
-  if (!id || !pseudo || !message) {
+  if (!id || !message) {
     return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  if (!pseudo) {
+    const cookies = parse(req.headers.cookie || "");
+    const userCookie = cookies.user;
+    if (userCookie) {
+      try {
+        const user = JSON.parse(userCookie);
+        pseudo = user.username;
+      } catch (error) {
+        console.error("Error parsing user cookie:", error);
+      }
+    }
   }
 
   try {

@@ -3,18 +3,32 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/session";
 import Header from "@/components/Header";
 
-export default function Home() {
-  const [user, setUser] = useState(null);
+export async function getServerSideProps(context) {
+  const user = getCurrentUser(context.req);
+
+  return {
+    props: {
+      initialUser: user || null,
+    },
+  };
+}
+
+export default function Home({ initialUser }) {
+  const [user, setUser] = useState(initialUser);
   const [interactions, setInteractions] = useState([]);
 
   useEffect(() => {
-    setUser(getCurrentUser());
-  }, []);
+    if (!initialUser) {
+      setUser(getCurrentUser());
+    }
+  }, [initialUser]);
 
   useEffect(() => {
     async function fetchInteractions() {
       try {
-        const response = await fetch("/api/books");
+        const response = await fetch("/api/books", {
+          credentials: 'include',
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch books");
         }
@@ -27,9 +41,25 @@ export default function Home() {
     fetchInteractions();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
+  useEffect(() => {
+    console.log("User state on homepage:", user);
+  }, [user]);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to log out");
+      }
+
+      setUser(null);
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (
@@ -41,7 +71,7 @@ export default function Home() {
 
       {user ? (
         <>
-          <p>Connecté en tant que : <strong>{user.pseudo}</strong></p>
+          <p>Connecté en tant que : <strong>{user.username}</strong></p>
           <button onClick={handleLogout}>Se déconnecter</button>
           <hr style={{ margin: "30px 0" }} />
         </>

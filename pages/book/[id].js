@@ -11,6 +11,7 @@ import axios from "axios";
 export async function getServerSideProps(context) {
   const { id } = context.params;
   const book = await getBookById(id);
+  const user = getCurrentUser(context.req);
 
   if (!book) {
     return {
@@ -25,14 +26,21 @@ export async function getServerSideProps(context) {
   return {
     props: {
       book,
+      initialUser: user || null,
     },
   };
 }
 
-export default function BookPage({ book }) {
+export default function BookPage({ book, initialUser }) {
   const router = useRouter();
-  const user = getCurrentUser();
-  const pseudo = user?.pseudo || "inconnu";
+  const [user, setUser] = useState(initialUser);
+  const pseudo = user?.username || "inconnu";
+
+  useEffect(() => {
+    if (!initialUser) {
+      setUser(getCurrentUser());
+    }
+  }, [initialUser]);
 
   const [location, setLocation] = useState("");
   const [comment, setComment] = useState("");
@@ -109,12 +117,14 @@ export default function BookPage({ book }) {
   }, [selectedBookBox]);
 
   const handleConfirmInteraction = useCallback(async () => {
+    console.log("Pseudo sent for interaction:", pseudo);
     if (!pendingAction || !selectedBookBox) return;
 
     try {
       const response = await fetch("/api/interaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           id: book.id,
           action: pendingAction,
@@ -139,6 +149,7 @@ export default function BookPage({ book }) {
   }, [pendingAction, selectedBookBox, book.id, pseudo, router]);
 
   const handleAddComment = useCallback(async () => {
+    console.log("Pseudo sent for comment:", pseudo);
     if (!comment.trim()) {
       alert("Ton commentaire est vide.");
       return;
@@ -148,6 +159,7 @@ export default function BookPage({ book }) {
       const response = await fetch("/api/comment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({
           id: book.id,
           pseudo,
@@ -239,7 +251,8 @@ export default function BookPage({ book }) {
 
       const { latitude, longitude } = coords;
       const bookBoxes = await fetchBookBoxes(latitude, longitude);
-      setNearbyBookBoxes(bookBoxes);
+      const enhancedBookBoxes = await Promise.all(bookBoxes.map(enhanceBookBoxWithAddress));
+      setNearbyBookBoxes(enhancedBookBoxes);
       setShowBookBoxes(true);
     } catch (error) {
       console.error("Error searching book boxes:", error);

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { getUser } from "@/lib/users";
 import Header from "@/components/Header";
-
+import { setCurrentUser } from "@/lib/session";
 
 export default function LoginPage() {
   const [pseudo, setPseudo] = useState("");
@@ -18,6 +18,7 @@ export default function LoginPage() {
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ username: pseudo, password }),
       });
 
@@ -26,7 +27,7 @@ export default function LoginPage() {
         throw new Error(data.error || "Failed to log in");
       }
 
-      localStorage.setItem("user", JSON.stringify({ username: pseudo }));
+      setCurrentUser({ username: pseudo }); // Store user in cookies
       router.push("/");
     } catch (err) {
       setError(err.message);
