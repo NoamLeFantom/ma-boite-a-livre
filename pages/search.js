@@ -17,12 +17,7 @@ export default function SearchPage() {
     setIsbnMatches([]);
 
     try {
-      const response = await fetch("/api/books", {
-        method: "GET",
-        headers: {
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
-        },
-      });
+      const response = await fetch(`/api/search?query=${encodeURIComponent(trimmedQuery)}`);
       const results = await response.json();
 
       if (!Array.isArray(results)) {
