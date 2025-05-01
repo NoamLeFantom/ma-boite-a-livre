@@ -2,13 +2,6 @@ import { getDb } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
 export default async function handler(req, res) {
-  const secretKey = process.env.API_SECRET_KEY;
-  const clientKey = req.headers["books-travelling"];
-
-  if (!clientKey || clientKey !== secretKey) {
-    return res.status(403).json({ error: "Forbidden: Invalid or missing header" });
-  }
-
   const db = await getDb();
 
   if (req.method === "GET") {
