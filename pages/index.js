@@ -29,7 +29,7 @@ export default function Home({ initialUser }) {
         const response = await fetch("/api/books", {
           credentials: 'include',
           headers: {
-            "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+            "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
           },
         });
         if (!response.ok) {
@@ -54,7 +54,7 @@ export default function Home({ initialUser }) {
         method: "POST",
         credentials: 'include',
         headers: {
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
       });
 

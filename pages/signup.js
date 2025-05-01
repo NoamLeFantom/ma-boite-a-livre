@@ -18,7 +18,7 @@ export default function SignupPage() {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          "Books-Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
         },
         credentials: 'include',
         body: JSON.stringify({ username, password, email }),
