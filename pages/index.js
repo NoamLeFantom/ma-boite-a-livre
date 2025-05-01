@@ -28,6 +28,9 @@ export default function Home({ initialUser }) {
       try {
         const response = await fetch("/api/books", {
           credentials: 'include',
+          headers: {
+            "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          },
         });
         if (!response.ok) {
           throw new Error("Failed to fetch books");
@@ -50,6 +53,9 @@ export default function Home({ initialUser }) {
       const response = await fetch("/api/logout", {
         method: "POST",
         credentials: 'include',
+        headers: {
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+        },
       });
 
       if (!response.ok) {

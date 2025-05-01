@@ -16,7 +16,10 @@ export default function LoginPage() {
     try {
       const response = await fetch("/api/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+        },
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });

@@ -32,7 +32,12 @@ export default function AdminPage() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch("/api/books", { credentials: "include" });
+        const response = await fetch("/api/books", { 
+          credentials: "include",
+          headers: {
+            "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+          },
+        });
         const data = await response.json();
         setBooks(data);
       } catch (error) {
@@ -47,7 +52,10 @@ export default function AdminPage() {
     try {
       const response = await fetch("/api/books", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+        },
         body: JSON.stringify(newBook),
       });
 
@@ -68,6 +76,9 @@ export default function AdminPage() {
     try {
       const response = await fetch(`/api/books/${id}`, {
         method: "DELETE",
+        headers: {
+          "Books Travelling": process.env.NEXT_PUBLIC_API_SECRET_KEY,
+        },
       });
 
       if (!response.ok) {
