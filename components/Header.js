@@ -14,7 +14,7 @@ const Header = () => {
 
   return (
     <header>
-      <h1>Book Traveller</h1>
+      <h1>Books Travelling</h1>
       <nav>
         <a href="/">
           <img src="/src/ui/logo-letter.png" alt="Logo du site" />

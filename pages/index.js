@@ -67,7 +67,7 @@ export default function Home({ initialUser }) {
       <Header />
       <Link href="/search">🔎 Rechercher un livre</Link>
 
-      <h1>Bienvenue dans Book Traveller 📚</h1>
+      <h1>Bienvenue dans Books Travellinger 📚</h1>
 
       {user ? (
         <>
