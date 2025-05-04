@@ -182,34 +182,42 @@ export default function BookPage({ book, initialUser }) {
 
   const handleGetLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      alert("La géolocalisation n'est pas supportée par ton navigateur.");
+      alert("La géolocalisation n'est pas supportée par votre navigateur.");
       return;
     }
 
     setIsLoading(true);
 
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords: { latitude, longitude } }) => {
-        setUserCoords({ latitude, longitude });
-        setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-
-        try {
-          const nearby = await fetchBookBoxes(latitude, longitude);
-          const enhancedNearby = await Promise.all(nearby.map(enhanceBookBoxWithAddress));
-          setNearbyBookBoxes(enhancedNearby);
-          setShowBookBoxes(true);
-        } catch (error) {
-          console.error("Erreur lors de la récupération des boîtes à livres :", error);
-          alert("Une erreur s'est produite lors de la récupération des boîtes à livres.");
-        } finally {
-          setIsLoading(false);
-        }
-      },
-      (error) => {
+    navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
+      if (permissionStatus.state === 'denied') {
+        alert("La géolocalisation est désactivée. Veuillez l'activer dans les paramètres de votre navigateur.");
         setIsLoading(false);
-        alert("Erreur de géolocalisation: " + error.message);
+        return;
       }
-    );
+
+      navigator.geolocation.getCurrentPosition(
+        async ({ coords: { latitude, longitude } }) => {
+          setUserCoords({ latitude, longitude });
+          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+
+          try {
+            const nearby = await fetchBookBoxes(latitude, longitude);
+            const enhancedNearby = await Promise.all(nearby.map(enhanceBookBoxWithAddress));
+            setNearbyBookBoxes(enhancedNearby);
+            setShowBookBoxes(true);
+          } catch (error) {
+            console.error("Erreur lors de la récupération des boîtes à livres :", error);
+            alert("Une erreur s'est produite lors de la récupération des boîtes à livres.");
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        (error) => {
+          setIsLoading(false);
+          alert("Erreur de géolocalisation : " + error.message);
+        }
+      );
+    });
   }, []);
 
   const selectBookBox = useCallback((bookBox) => {

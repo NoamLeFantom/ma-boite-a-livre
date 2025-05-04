@@ -32,9 +32,16 @@ export default function SignupPage() {
         return;
       }
       setCurrentUser(user); // Automatically log in the user after signup
-      console.log("User signed up and logged in:", user);
 
-      router.push("/login");
+      // Send validation email
+      await fetch("/api/send-validation-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      alert("Inscription réussie ! Un email de validation a été envoyé.");
+      router.push("/test");
     } catch (err) {
       setError(err.message);
     }
