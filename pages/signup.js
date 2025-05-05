@@ -41,7 +41,7 @@ export default function SignupPage() {
       });
 
       alert("Inscription réussie ! Un email de validation a été envoyé.");
-      router.push("/test");
+      router.push("/email-wasSend");
     } catch (err) {
       setError(err.message);
     }

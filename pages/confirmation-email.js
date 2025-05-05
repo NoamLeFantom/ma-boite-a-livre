@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -31,6 +32,7 @@ export default function ConfirmEmailPage() {
     <div style={{ padding: 20 }}>
       <h1>Confirmation d'email</h1>
       <p>{message}</p>
+      <Link href="/login">Connectez-vous ici</Link>
     </div>
   );
 }
