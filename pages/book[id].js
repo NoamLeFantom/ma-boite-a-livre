@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/session";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { getBookById } from "@/lib/data";
+import styles from "@/styles/Home.module.css";
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
@@ -271,7 +272,7 @@ export default function BookPage({ book }) {
     };
 
     return (
-        <div style={{ padding: 20 }}>
+        <div className={styles.container}>
             <Header />
             <h1>{book.title}</h1>
             <p><strong>Auteur:</strong> {book.author}</p>

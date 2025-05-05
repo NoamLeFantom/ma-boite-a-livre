@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { getCurrentUser } from "@/lib/session";
+import Header from "@/components/Header";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -83,6 +84,7 @@ export default function AdminPage() {
 
   return (
     <div style={{ padding: 20 }}>
+      <Header/>
       <h1>Administration</h1>
       <h2>Gestion des livres</h2>
 

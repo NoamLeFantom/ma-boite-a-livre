@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { setCurrentUser } from "@/lib/session";
+import Header from "@/components/Header";
 
 export default function SignupPage() {
   const [username, setUsername] = useState("");
@@ -49,6 +50,7 @@ export default function SignupPage() {
 
   return (
     <div style={{ padding: 20 }}>
+      <Header />
       <h1>Créer un compte</h1>
       <form onSubmit={handleSignup}>
         <div>

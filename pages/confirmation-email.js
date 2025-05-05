@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Header from "@/components/Header";
+import styles from "@/styles/Home.module.css";
 
 export default function ConfirmEmailPage() {
   const router = useRouter();
@@ -29,7 +31,8 @@ export default function ConfirmEmailPage() {
   }, [token]);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className={styles.container}>
+      <Header />
       <h1>Confirmation d'email</h1>
       <p>{message}</p>
       <Link href="/login">Connectez-vous ici</Link>

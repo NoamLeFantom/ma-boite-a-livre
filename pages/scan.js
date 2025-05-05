@@ -2,7 +2,7 @@
 import QRCodeScanner from "@/components/QRCodeScanner";
 import { useRouter } from "next/router";
 import Header from "@/components/Header";
-
+import styles from "@/styles/Home.module.css";
 
 export default function ScanPage() {
   const router = useRouter();
@@ -21,8 +21,8 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="p-4">
-      <Header/>
+    <div className={styles.container}>
+      <Header />
       <h1 className="text-xl font-semibold mb-4">Scanner un QR Code 📖</h1>
       <QRCodeScanner onScan={handleScan} />
     </div>
