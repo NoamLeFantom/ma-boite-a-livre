@@ -48,57 +48,59 @@ export default function SearchPage() {
   return (
     <div className="p-4">
       <Header />
-      <h1 className="text-xl font-bold mb-2">🔎 Rechercher un livre</h1>
+      <div class="GlobalPage">
+        <h1 className="text-xl font-bold mb-2">🔎 Rechercher un livre</h1>
 
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Ex : isbn-0002 ou Candide"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="border p-2 rounded mr-2"
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          {loading ? "Recherche..." : "Rechercher"}
-        </button>
-      </div>
-
-      {exactMatch && (
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold">📘 Livre exact trouvé</h2>
-          <Link href={`/book/${exactMatch.id}`}>
-            <div className="border p-2 rounded mt-2 cursor-pointer">
-              <strong>{exactMatch.title}</strong> — ID : {exactMatch.id}
-            </div>
-          </Link>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Ex : isbn-0002 ou Candide"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="border p-2 rounded mr-2"
+          />
+          <button
+            onClick={handleSearch}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            {loading ? "Recherche..." : "Rechercher"}
+          </button>
         </div>
-      )}
 
-      <div>
-        <h2 className="text-lg font-semibold">
-          📚 {exactMatch ? "Autres exemplaires du même livre" : "Résultats"}
-        </h2>
-
-        {isbnMatches.length === 0 && query && !loading && (
-          <p className="text-gray-500">Aucun résultat trouvé.</p>
+        {exactMatch && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold">📘 Livre exact trouvé</h2>
+            <Link href={`/book/${exactMatch.id}`}>
+              <div className="border p-2 rounded mt-2 cursor-pointer">
+                <strong>{exactMatch.title}</strong> — ID : {exactMatch.id}
+              </div>
+            </Link>
+          </div>
         )}
 
-        <ul className="mt-2 space-y-2">
-          {isbnMatches.map((book) => (
-            <li key={book.id} className="border p-2 rounded">
-              <Link href={`/book/${book.id}`}>
-                <strong>{book.title}</strong> — ID : {book.id}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+        <div>
+          <h2 className="text-lg font-semibold">
+            📚 {exactMatch ? "Autres exemplaires du même livre" : "Résultats"}
+          </h2>
 
-      <div className="mt-6">
-        <a href="/scan" className="text-blue-600 underline">📷 Scanner un QR Code</a>
+          {isbnMatches.length === 0 && query && !loading && (
+            <p className="text-gray-500">Aucun résultat trouvé.</p>
+          )}
+
+          <ul className="mt-2 space-y-2">
+            {isbnMatches.map((book) => (
+              <li key={book.id} className="border p-2 rounded">
+                <Link href={`/book/${book.id}`}>
+                  <strong>{book.title}</strong> — ID : {book.id}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-6">
+          <a href="/scan" className="text-blue-600 underline">📷 Scanner un QR Code</a>
+        </div>
       </div>
     </div>
   );

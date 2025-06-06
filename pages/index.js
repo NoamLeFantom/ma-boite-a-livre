@@ -63,42 +63,41 @@ export default function Home({ initialUser }) {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 0 }}>
       <Header />
-      <Link href="/search">🔎 Rechercher un livre</Link>
+      <div class="GlobalPage">
 
-      <h1>Bienvenue dans Books Travellinger 📚</h1>
+        {user ? (
+          <>
+            <p>Connecté en tant que : <strong>{user.username}</strong></p>
+            <button onClick={handleLogout}>Se déconnecter</button>
+            <hr style={{ margin: "30px 0" }} />
+          </>
 
-      {user ? (
-        <>
-          <p>Connecté en tant que : <strong>{user.username}</strong></p>
-          <button onClick={handleLogout}>Se déconnecter</button>
-          <hr style={{ margin: "30px 0" }} />
-        </>
+        ) : (
+          <>
+            <p>Tu n'es pas connecté.</p>
+            <Link href="/login">Se connecter</Link>
+            <br /><br />
+            <Link href="/signup"><button>Créer un compte</button></Link>
+          </>
+        )}
 
-      ) : (
-        <>
-          <p>Tu n'es pas connecté.</p>
-          <Link href="/login"><button>Se connecter</button></Link>
-          <br /><br />
-          <Link href="/signup"><button>Créer un compte</button></Link>
-        </>
-      )}
+        <hr style={{ margin: "30px 0" }} />
 
-      <hr style={{ margin: "30px 0" }} />
-
-      <h2>📖 Dernières interactions</h2>
-      <ul>
-        {interactions.map((entry, index) => (
-          <li key={index}>
-            <Link href={`/book/view/${entry.id}`}>
-              <strong>{entry.title}</strong>
-            </Link>{" "}
-            — par <em>{entry.pseudo}</em> le{" "}
-            {entry.date ? new Date(entry.date).toLocaleDateString() : "Date inconnue"}
-          </li>
-        ))}
-      </ul>
+        <h2>📖 Dernières interactions</h2>
+        <ul>
+          {interactions.map((entry, index) => (
+            <li key={index}>
+              <Link href={`/book/view/${entry.id}`}>
+                <strong>{entry.title}</strong>
+              </Link>{" "}
+              — par <em>{entry.pseudo}</em> le{" "}
+              {entry.date ? new Date(entry.date).toLocaleDateString() : "Date inconnue"}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

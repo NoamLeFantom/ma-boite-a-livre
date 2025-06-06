@@ -23,8 +23,10 @@ export default function ScanPage() {
   return (
     <div className={styles.container}>
       <Header />
+      <div class="GlobalPage">
       <h1 className="text-xl font-semibold mb-4">Scanner un QR Code 📖</h1>
       <QRCodeScanner onScan={handleScan} />
+    </div>
     </div>
   );
 }

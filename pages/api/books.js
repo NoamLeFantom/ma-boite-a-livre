@@ -13,7 +13,7 @@ export default async function handler(req, res) {
       res.status(500).json({ error: "Failed to fetch books" });
     }
   } else if (req.method === "POST") {
-    const { title, author, isbn, history, comments, literaryMovement } = req.body;
+    const { title, author, isbn, descrition, history, comments, literaryMovement } = req.body;
 
     if (!title || !author || !isbn) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -29,6 +29,7 @@ export default async function handler(req, res) {
         title,
         author,
         isbn,
+        descrition,
         history: history || [],
         comments: comments || "",
         literaryMovement: literaryMovement || "",
@@ -40,6 +41,7 @@ export default async function handler(req, res) {
         title,
         author,
         isbn,
+        descrition,
         history,
         comments,
         literaryMovement,

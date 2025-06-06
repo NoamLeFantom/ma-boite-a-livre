@@ -50,8 +50,9 @@ export default function ProfilePage() {
   if (!user) return <div><Header/><p>Vous devez être connecté pour voir cette page.</p></div>;
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 0 }}>
       <Header />
+      <div class="GlobalPage">
       <h1>Mon Profil</h1>
       {success && <p style={{ color: "green" }}>{success}</p>}
       <label>
@@ -75,6 +76,7 @@ export default function ProfilePage() {
       <button onClick={handleDelete} style={{ color: "red" }}>
         Supprimer mon compte
       </button>
+    </div>
     </div>
   );
 }

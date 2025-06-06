@@ -47,8 +47,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 0 }}>
       <Header />
+      <div class="GlobalPage">
       <h1>Connexion</h1>
       <form onSubmit={handleLogin}>
         <input
@@ -67,7 +68,11 @@ export default function LoginPage() {
         />
         <button type="submit">Se connecter</button>
       </form>
+      <p>
+        <a href="/forgot-password">Mot de passe oublié ?</a>
+      </p>
       {error && <p style={{ color: "red" }}>{error}</p>}
+    </div>
     </div>
   );
 }

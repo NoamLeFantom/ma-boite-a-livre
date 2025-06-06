@@ -278,7 +278,7 @@ export default function BookPage({ book }) {
             <p><strong>Auteur:</strong> {book.author}</p>
             <p><strong>ISBN:</strong> {book.isbn}</p>
             <p><strong>Unique ID:</strong> {book.id}</p>
-
+            <p><strong>Description:</strong> {book.description}</p>
             <hr />
 
             <h2>Actions</h2>
