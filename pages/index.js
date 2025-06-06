@@ -80,69 +80,99 @@ export default function Home({ initialUser }) {
     }
   }, [books]);
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("/api/logout", {
-        method: "POST",
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to log out");
-      }
-
-      setUser(null);
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
-  };
 
   return (
     <div style={{ padding: 0 }}>
       <Header />
       <div className="GlobalPage">
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <h1 style={{marginBottom:"20px"}}>Bienvenue sur Books Travellers</h1>
+          <h1 style={{ marginBottom: "20px" }}>Bienvenue sur Books Travellers</h1>
           {user ? (
             <>
-              <p>Heureux de te voir <strong>{user.username}</strong></p>
+              <p style={{ marginBottom: "20px" }}>Heureux de te voir <strong style={{ color: "#0070f3" }}>{user.username}</strong></p>
             </>
           ) : (
             <>
-              <Link href="/signup"><button>Rejoindre l'aventure</button></Link>
+              <Link style={{marginBottom:"20px"}} href="/signup"><button>Rejoindre l'aventure</button></Link>
             </>
           )}
+          <p style={{textAlign:"left"}}>
+            L'application qui permet d'écrire la nouvelle histoire des livres en quelques cliques ! <br/> Récupére ou dépose un livre en scanant le QR code !
+            <Link href="/scan"><button>Scaner le livre</button></Link>
+
+        </p>
         </div>
+        <h2>📚 Livres les plus commentés</h2>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {[...books]
+            .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
+            .slice(0, 1) // top 5
+            .map((book, index) => (
+              <li key={index} style={{ display: "flex", alignItems: "center", marginBottom: "15px" }}>
+                <img
+                  src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
+                  alt={`Couverture de ${book.title}`}
+                  style={{
+                    width: "50px",
+                    height: "75px",
+                    objectFit: "cover",
+                    marginRight: "10px",
+                  }}
+                />
+                <div>
+                  <Link href={`/book/view/${book.id}`}>
+                    <strong>{book.title}</strong>
+                  </Link>{" "}
+                  — {book.comments?.length || 0} commentaire(s)
+                </div>
+              </li>
+            ))}
+        </ul>
+
+        
 
         <h2>📖 Dernières interactions</h2>
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {interactions.map((entry, index) => (
-            <li key={index} style={{ display: "flex", alignItems: "center", marginBottom: "15px" }}>
-              <img
-                src={
-                  bookImages[entry.isbn]
-                    ? bookImages[entry.isbn]
-                    : "/images/BooksTravellers.png"
-                }
-                alt={`Couverture de ${entry.title}`}
-                style={{
-                  width: "50px",
-                  height: "75px",
-                  objectFit: "cover",
-                  marginRight: "10px",
-                  backgroundColor: "#eee",
-                }}
-              />
-              <div>
-                <Link href={`/book/view/${entry.id}`}>
-                  <strong>{entry.title}</strong>
-                </Link>
-                <p>{entry.isbn}</p>
-                — par <em>{entry.pseudo}</em> le{" "}
-                {entry.date ? new Date(entry.date).toLocaleDateString() : "Date inconnue"}
-              </div>
-            </li>
-          ))}
+          {interactions.map((entry, index) => {
+            const lastInteraction = entry.history?.length
+              ? [...entry.history].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+              : null;
+
+            return (
+              <li key={index} style={{ display: "flex", alignItems: "center", marginBottom: "15px" }}>
+                <img
+                  src={
+                    bookImages[entry.isbn]
+                      ? bookImages[entry.isbn]
+                      : "/images/BooksTravellers.png"
+                  }
+                  alt={`Couverture de ${entry.title}`}
+                  style={{
+                    width: "50px",
+                    height: "75px",
+                    objectFit: "cover",
+                    marginRight: "10px",
+                    backgroundColor: "#eee",
+                  }}
+                />
+                <div>
+                  <Link href={`/book/view/${entry.id}`}>
+                    <strong>{entry.title}</strong>
+                  </Link>
+                  <p>{entry.isbn}</p>
+                  {lastInteraction ? (
+                    <>
+                      — par <em>{lastInteraction.pseudo}</em> le{" "}
+                      {new Date(lastInteraction.date).toLocaleDateString()}
+                    </>
+                  ) : (
+                    "— Aucune interaction"
+                  )}
+                </div>
+              </li>
+            );
+          })}
+
         </ul>
       </div>
     </div>

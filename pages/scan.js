@@ -24,6 +24,7 @@ export default function ScanPage() {
     <div className={styles.container}>
       <Header />
       <div class="GlobalPage">
+        <p>Vérifie bien que le livre posséde un QR code qui renvoie vers un url comme "https://ma-boite-a-livre.vercel.app/book</p>
       <h1 className="text-xl font-semibold mb-4">Scanner un QR Code 📖</h1>
       <QRCodeScanner onScan={handleScan} />
     </div>

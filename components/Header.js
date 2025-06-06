@@ -46,10 +46,7 @@ export default function Header() {
             <a href="/search" className={styles.navLink}>Rechercher</a>
             {user ? (
               <>
-                <a href="/profile" className={styles.navLink}>Profil</a>
-                <button onClick={handleLogout} className={styles.navLink} style={{ background: "none", border: "none", cursor: "pointer" }}>
-                  Déconnexion
-                </button>
+                <a href="/profil" className={styles.navLink}>Profil</a>
               </>
             ) : (
               <a href="/login" className={styles.navLink}>Connexion</a>
