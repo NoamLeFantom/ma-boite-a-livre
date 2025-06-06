@@ -38,8 +38,8 @@ export default function Header() {
       <div className={styles.container}>
         <a href="/" className={styles.logoLink}>
           <img src="/images/BooksTravellers.png" alt="Logo du site" className={styles.logo} />
+          <h1 style={{ fontSize: "1rem",zIndex:10 }}>Books Travellers</h1>
         </a>
-        <h1 style={{ fontSize: "1rem",zIndex:10 }}>Books Travellers</h1>
         <nav className={`${styles.nav} ${isMenuOpen ? styles.open : ""}`}>
           <div className={styles.navList}>
             <a href="/" className={styles.navLink}>Accueil</a>

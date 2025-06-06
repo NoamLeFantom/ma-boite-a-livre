@@ -1,6 +1,6 @@
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #030303;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -66,10 +66,6 @@ button:hover {
 a {
   color: #0070f3;
   text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
 }
 
 hr {

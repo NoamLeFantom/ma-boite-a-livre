@@ -306,8 +306,9 @@ export default function BookPage({ book, initialUser }) {
   if (!book) return <p>Livre introuvable.</p>;
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 0 }}>
       <Header />
+      <div className="GlobalPage">
       <h1>{book.title}</h1>
       <p><strong>Auteur:</strong> {book.author}</p>
       <p><strong>ISBN:</strong> {book.isbn}</p>
@@ -458,6 +459,7 @@ export default function BookPage({ book, initialUser }) {
           ))}
         </ul>
       )}
+    </div>
     </div>
   )
 };

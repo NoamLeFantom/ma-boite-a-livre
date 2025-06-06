@@ -5,7 +5,6 @@ import { getCurrentUser } from "@/lib/session";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import { getBookById } from "@/lib/data";
-import styles from "@/styles/Home.module.css";
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
@@ -272,8 +271,9 @@ export default function BookPage({ book }) {
     };
 
     return (
-        <div className={styles.container}>
+        <div style={{ padding: 0 }}>
             <Header />
+            <div className={styles.GlobalPage}>
             <h1>{book.title}</h1>
             <p><strong>Auteur:</strong> {book.author}</p>
             <p><strong>ISBN:</strong> {book.isbn}</p>
@@ -462,6 +462,7 @@ export default function BookPage({ book }) {
                     </button>
                 </div>
             )}
+        </div>
         </div>
     )
 };

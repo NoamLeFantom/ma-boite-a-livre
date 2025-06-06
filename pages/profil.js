@@ -1,5 +1,7 @@
 // pages/profile.js
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import cookie from "js-cookie";
 import Header from "@/components/Header";
 import { getCurrentUser } from "@/lib/session";
 
@@ -8,6 +10,7 @@ export default function ProfilePage() {
   const [form, setForm] = useState({ name: "", email: "" });
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -46,6 +49,18 @@ export default function ProfilePage() {
     }
   };
 
+  const handleLogout = () => {
+    // Afficher une popup de confirmation
+    const confirmLogout = window.confirm("Êtes-vous sûr de vouloir vous déconnecter ?");
+    if (confirmLogout) {
+      // Supprimer le cookie d'authentification
+      cookie.remove("user");
+
+      // Rediriger vers la page de connexion
+      router.push("/");
+    }
+  };
+
   if (loading) return <p>Chargement...</p>;
   if (!user) return <div><Header/><p>Vous devez être connecté pour voir cette page.</p></div>;
 
@@ -75,6 +90,10 @@ export default function ProfilePage() {
       <br /><br />
       <button onClick={handleDelete} style={{ color: "red" }}>
         Supprimer mon compte
+      </button>
+      {/* Ajout du bouton de déconnexion */}
+      <button onClick={handleLogout} style={{ marginTop: 20 }}>
+        Déconnexion
       </button>
     </div>
     </div>

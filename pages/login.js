@@ -50,29 +50,32 @@ export default function LoginPage() {
     <div style={{ padding: 0 }}>
       <Header />
       <div class="GlobalPage">
-      <h1>Connexion</h1>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Se connecter</button>
-      </form>
+        <h1>Connexion</h1>
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Se connecter</button>
+        </form>
+        <p>
+          <a href="/forgot-password">Mot de passe oublié ?</a>
+        </p>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+      </div>
       <p>
-        <a href="/forgot-password">Mot de passe oublié ?</a>
+        Pas encore de compte ? <a href="/signup">Créer un compte</a>
       </p>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
     </div>
   );
 }

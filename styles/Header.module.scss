@@ -24,13 +24,15 @@
 }
 
 .logoLink {
-  display: block;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   transition: transform 0.2s ease;
   z-index: 1000;
-  
-  &:hover {
-    transform: scale(1.05);
-  }
+  text-decoration: none;
+  :hover {
+    text-decoration: none;
+    }
 }
 .logo {
   height: 40px;
