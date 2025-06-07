@@ -48,7 +48,7 @@ export default function ScanPage({ initialUser }) {
           comme "https://ma-boite-a-livre.vercel.app/book"
         </p>
         <h1 className="text-xl font-semibold mb-4">Scanner un QR Code 📖</h1>
-        <QRCodeScanner onScan={handleScan} />
+        <QRCodeScanner onScan={handleScan} active={!showPopup} />
 
         {/* Popup HTML */}
         {showPopup && (
@@ -85,5 +85,19 @@ export default function ScanPage({ initialUser }) {
         )}
       </div>
     </div>
+  );
+}
+
+// ...dans QRCodeScanner.js...
+export default function QRCodeScanner({ onScan, active }) {
+  return (
+    <QrReader
+      onResult={(result, error) => {
+        if (result && active) onScan(result?.text);
+      }}
+      constraints={{ facingMode: "environment" }}
+      style={{ width: "100%" }}
+      // Ajoute un style ou un overlay si !active
+    />
   );
 }
