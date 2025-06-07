@@ -87,17 +87,3 @@ export default function ScanPage({ initialUser }) {
     </div>
   );
 }
-
-// ...dans QRCodeScanner.js...
-export default function QRCodeScanner({ onScan, active }) {
-  return (
-    <QrReader
-      onResult={(result, error) => {
-        if (result && active) onScan(result?.text);
-      }}
-      constraints={{ facingMode: "environment" }}
-      style={{ width: "100%" }}
-      // Ajoute un style ou un overlay si !active
-    />
-  );
-}

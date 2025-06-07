@@ -2,12 +2,14 @@
 import { useEffect, useRef } from "react";
 import QrScanner from "qr-scanner";
 
-export default function QRCodeScanner({ onScan }) {
+export default function QRCodeScanner({ onScan, active = true }) {
   const videoRef = useRef(null);
   const scannerRef = useRef(null);
 
   useEffect(() => {
-    if (videoRef.current) {
+    if (!videoRef.current) return;
+
+    if (!scannerRef.current) {
       scannerRef.current = new QrScanner(
         videoRef.current,
         (result) => {
@@ -18,14 +20,18 @@ export default function QRCodeScanner({ onScan }) {
           returnDetailedScanResult: true,
         }
       );
+    }
 
+    if (active) {
       scannerRef.current.start();
+    } else {
+      scannerRef.current.stop();
     }
 
     return () => {
       scannerRef.current?.stop();
     };
-  }, [onScan]);
+  }, [onScan, active]);
 
   return (
     <div>
