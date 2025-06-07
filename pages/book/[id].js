@@ -34,6 +34,9 @@ export default function BookPage({ book, initialUser }) {
   const [user, setUser] = useState(initialUser);
   const pseudo = user?.username || "inconnu";
 
+  const [books, setBooks] = useState([]);
+  const [bookImages, setBookImages] = useState({});
+
   useEffect(() => {
     if (!initialUser) {
       setUser(getCurrentUser());
@@ -68,15 +71,6 @@ export default function BookPage({ book, initialUser }) {
   }, []);
 
   const deg2rad = useCallback((deg) => deg * (Math.PI / 180), []);
-
-  const getNearbyBookBoxes = useCallback((latitude, longitude) => {
-    const bookBoxesWithDistance = BOOK_BOXES.map(box => {
-      const distance = calculateDistance(latitude, longitude, box.latitude, box.longitude);
-      return { ...box, distance };
-    });
-
-    return bookBoxesWithDistance.sort((a, b) => a.distance - b.distance);
-  }, [calculateDistance]);
 
   const fetchAddressFromCoordinates = async (latitude, longitude) => {
     try {
@@ -305,286 +299,339 @@ export default function BookPage({ book, initialUser }) {
 
   if (!book) return <p>Livre introuvable.</p>;
 
+  useEffect(() => {
+    async function fetchInteractions() {
+      try {
+        const response = await fetch("/api/books", {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch books");
+        }
+        const data = await response.json();
+        setBooks(data); // car tu récupères les livres ici
+      } catch (error) {
+        console.error("Error fetching interactions:", error);
+      }
+    }
+
+    fetchInteractions();
+  }, []);
+
+  useEffect(() => {
+    const fetchBookImages = async () => {
+      const images = {};
+
+      await Promise.all(
+        books.map(async (book) => {
+          if (!book.isbn || typeof book.isbn !== "string") return;
+
+          try {
+            const response = await fetch(
+              `https://www.googleapis.com/books/v1/volumes?q=isbn:${book.isbn}`
+            );
+            const data = await response.json();
+            const thumbnail =
+              data.items?.[0]?.volumeInfo?.imageLinks?.thumbnail || null;
+
+            images[book.isbn] = thumbnail;
+          } catch (error) {
+            console.error(
+              `Erreur lors de la récupération de l'image pour ISBN ${book.isbn}:`,
+              error
+            );
+            images[book.isbn] = null;
+          }
+        })
+      );
+
+      setBookImages(images);
+    };
+
+    if (books.length > 0) {
+      fetchBookImages();
+    }
+  }, [books]);
+
   return (
-    <div style={{ padding: 20 }}>
+    <div>
       <Header />
-      <h1>{book.title}</h1>
-      <p><strong>Auteur:</strong> {book.author}</p>
-      <p><strong>ISBN:</strong> {book.isbn}</p>
-      <p><strong>Unique ID:</strong> {book.id}</p>
+      <div className="GlobalPage">
+        <h1>{book.title}</h1>
+        <p><strong>Auteur:</strong> {book.author}</p>
+        <p><strong>ISBN:</strong> {book.isbn}</p>
+        <p><strong>Unique ID:</strong> {book.id}</p>
+        <img
+  className="commentaire_img"
+  src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
+  alt={`Couverture de ${book.title}`}
+/>
 
-      <hr />
+        <h2>Actions</h2>
+        <div style={{ marginBottom: "10px" }}>
+          <input
+            type="text"
+            placeholder="Nom de la ville (ex: Paris, Lyon, etc.)"
+            value={location}
+            onChange={handleSearchChange}
+            style={{ marginRight: "10px", width: "250px" }}
+          />
+          {suggestedCities.length > 0 && (
+            <ul style={{ listStyleType: "none", padding: 0, marginTop: "5px", border: "1px solid #ddd", borderRadius: "4px", backgroundColor: "#fff" }}>
+              {suggestedCities.map((city, index) => (
+                <li
+                  key={index}
+                  onClick={() => handleCitySelect(city)}
+                  style={{ padding: "8px", cursor: "pointer", borderBottom: "1px solid #eee" }}
+                >
+                  {city.name}, {city.city}
+                </li>
+              ))}
+            </ul>
+          )}
+          <button
+            onClick={searchBookBoxes}
+            style={{ marginRight: "10px", padding: "5px 10px", backgroundColor: "#007BFF", color: "white", border: "none", borderRadius: "4px" }}
+          >
+            🔍 Rechercher
+          </button>
+          <button
+            onClick={handleGetLocation}
+            disabled={isLoading}
+            style={{ padding: "5px 10px", backgroundColor: "#28A745", color: "white", border: "none", borderRadius: "4px" }}
+          >
+            {isLoading ? "Localisation..." : "📍 Utiliser ma position"}
+          </button>
+        </div>
 
-      <h2>Actions</h2>
-      <div style={{ marginBottom: "10px" }}>
-        <input
-          type="text"
-          placeholder="Nom de la ville (ex: Paris, Lyon, etc.)"
-          value={location}
-          onChange={handleSearchChange}
-          style={{ marginRight: "10px", width: "250px" }}
-        />
-        {suggestedCities.length > 0 && (
-          <ul style={{ listStyleType: "none", padding: 0, marginTop: "5px", border: "1px solid #ddd", borderRadius: "4px", backgroundColor: "#fff" }}>
-            {suggestedCities.map((city, index) => (
-              <li
-                key={index}
-                onClick={() => handleCitySelect(city)}
-                style={{ padding: "8px", cursor: "pointer", borderBottom: "1px solid #eee" }}
-              >
-                {city.name}, {city.city}
+        {showBookBoxes && nearbyBookBoxes.length > 0 && (
+          <div style={{ marginBottom: "15px", border: "1px solid #ddd", padding: "10px", borderRadius: "5px" }}>
+            <h3>Boîtes à livres trouvées:</h3>
+            <ul style={{ listStyleType: "none", padding: 0 }}>
+              {nearbyBookBoxes.map(box => (
+                <li key={box.id} style={{
+                  marginBottom: "8px",
+                  padding: "12px",
+                  border: "1px solid #eee",
+                  borderRadius: "4px",
+                  backgroundColor: selectedBookBox?.id === box.id ? "#d1e7dd" : "#f9f9f9"
+                }}>
+                  <strong>{box.name}</strong>
+                  {box.distance && <span> - {box.distance.toFixed(2)} km</span>}
+                  <p style={{ margin: "5px 0", fontSize: "0.9em" }}>{box.description}</p>
+                  <p style={{ margin: "5px 0", fontSize: "0.9em", color: "#555" }}>{box.address}</p>
+                  <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                    <button
+                      onClick={() => selectBookBox(box)}
+                      style={{
+                        fontSize: "0.85em",
+                        padding: "5px 10px",
+                        backgroundColor: "#4CAF50",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px"
+                      }}
+                    >
+                      ✅ Sélectionner
+                    </button>
+                    <button
+                      onClick={() => viewBookBoxDetails(box)}
+                      style={{
+                        fontSize: "0.85em",
+                        padding: "5px 10px",
+                        backgroundColor: "#2196F3",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px"
+                      }}
+                    >
+                      🗺️ Voir sur la carte
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Book Box Details Modal */}
+        {showBookBoxDetails && selectedBookBox && (
+          <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000
+          }}>
+            <div style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              maxWidth: "500px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflow: "auto"
+            }}>
+              <h3 style={{ marginTop: 0 }}>{selectedBookBox.name}</h3>
+              <p><strong>Description:</strong> {selectedBookBox.description}</p>
+              <p><strong>Adresse:</strong> {selectedBookBox.address}</p>
+              <p><strong>Coordonnées:</strong> {selectedBookBox.latitude}, {selectedBookBox.longitude}</p>
+
+              <div style={{ marginTop: "15px" }}>
+                <h4>Voir sur la carte:</h4>
+                <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+                  <a
+                    href={getMapUrl(selectedBookBox)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 12px",
+                      backgroundColor: "#4285F4",
+                      color: "white",
+                      textDecoration: "none",
+                      borderRadius: "4px"
+                    }}>
+                    Google Maps
+                  </a>
+                  <a
+                    href={getOsmUrl(selectedBookBox)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 12px",
+                      backgroundColor: "#0066cc",
+                      color: "white",
+                      textDecoration: "none",
+                      borderRadius: "4px"
+                    }}>
+                    OpenStreetMap
+                  </a>
+                  <button
+                    onClick={closeBookBoxDetails}
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 12px",
+                      backgroundColor: "#f44336",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!pendingAction ? (
+          <div>
+            <button
+              onClick={() => handlePrepareInteraction("pris")}
+              style={{ marginRight: "10px" }}
+              disabled={!selectedBookBox}
+            >
+              📖 Pris
+            </button>
+            <button
+              onClick={() => handlePrepareInteraction("déposé")}
+              disabled={!selectedBookBox}
+            >
+              📚 Déposé
+            </button>
+          </div>
+        ) : (
+          <div style={{
+            marginTop: "15px",
+            padding: "15px",
+            backgroundColor: "#f8f9fa",
+            borderRadius: "5px",
+            border: "1px solid #dee2e6"
+          }}>
+            <p>
+              <strong>Confirmer l'action :</strong> {pendingAction === "pris" ? "Prendre" : "Déposer"} le livre à {selectedBookBox.address}
+            </p>
+            <button
+              onClick={handleConfirmInteraction}
+              style={{ marginRight: "10px" }}
+            >
+              ✅ Confirmer
+            </button>
+            <button
+              onClick={() => setPendingAction(null)}
+            >
+              ❌ Annuler
+            </button>
+          </div>
+        )}
+        <h2>Historique</h2>
+        {book.history.length === 0 ? (
+          <div className="history-block" style={{ color: "#888" }}>
+            Aucune interaction.
+          </div>
+        ) : (
+          <ul className="history-block">
+            {book.history.map((h, i) => (
+              <li className="history-item" key={i}>
+                <span style={{ fontWeight: 600, color: "var(--primary)" }}>{h.pseudo}</span>
+                <span style={{ fontSize: "0.95em", opacity: 0.7 }}>{h.date}</span>
+                <span style={{ fontSize: "1.05em" }}>
+                  a {h.action} le livre à <span style={{ fontWeight: 500 }}>{h.location}</span>
+                </span>
               </li>
             ))}
           </ul>
         )}
-        <button
-          onClick={searchBookBoxes}
-          style={{ marginRight: "10px", padding: "5px 10px", backgroundColor: "#007BFF", color: "white", border: "none", borderRadius: "4px" }}
+
+        <h2>Commentaires</h2>
+        <div className="glass-block" style={{ padding: 0, marginBottom: 24 }}>
+          {book.comments.length === 0 ? (
+            <p style={{ padding: "16px", color: "#888" }}>Aucun commentaire pour ce livre.</p>
+          ) : (
+            <ul className="comment-list">
+              {book.comments.map((c, i) => (
+                <li className="comment-item" key={i}>
+                  <div style={{ fontWeight: 600, color: "var(--primary)" }}>{c.pseudo}</div>
+                  <div style={{ fontSize: "0.95em", opacity: 0.7, marginBottom: 4 }}>{c.date}</div>
+                  <div style={{ fontSize: "1.05em" }}>{c.message}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <h2>Laisser un commentaire</h2>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleAddComment();
+          }}
+          className="glass-block"
+          style={{ padding: "20px", marginBottom: 32, display: "flex", flexDirection: "column", gap: 12, maxWidth: 600 }}
         >
-          🔍 Rechercher
-        </button>
-        <button
-          onClick={handleGetLocation}
-          disabled={isLoading}
-          style={{ padding: "5px 10px", backgroundColor: "#28A745", color: "white", border: "none", borderRadius: "4px" }}
-        >
-          {isLoading ? "Localisation..." : "📍 Utiliser ma position"}
-        </button>
-      </div>
-
-      {showBookBoxes && nearbyBookBoxes.length > 0 && (
-        <div style={{ marginBottom: "15px", border: "1px solid #ddd", padding: "10px", borderRadius: "5px" }}>
-          <h3>Boîtes à livres trouvées:</h3>
-          <ul style={{ listStyleType: "none", padding: 0 }}>
-            {nearbyBookBoxes.map(box => (
-              <li key={box.id} style={{
-                marginBottom: "8px",
-                padding: "12px",
-                border: "1px solid #eee",
-                borderRadius: "4px",
-                backgroundColor: selectedBookBox?.id === box.id ? "#d1e7dd" : "#f9f9f9"
-              }}>
-                <strong>{box.name}</strong>
-                {box.distance && <span> - {box.distance.toFixed(2)} km</span>}
-                <p style={{ margin: "5px 0", fontSize: "0.9em" }}>{box.description}</p>
-                <p style={{ margin: "5px 0", fontSize: "0.9em", color: "#555" }}>{box.address}</p>
-                <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-                  <button
-                    onClick={() => selectBookBox(box)}
-                    style={{
-                      fontSize: "0.85em",
-                      padding: "5px 10px",
-                      backgroundColor: "#4CAF50",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px"
-                    }}
-                  >
-                    ✅ Sélectionner
-                  </button>
-                  <button
-                    onClick={() => viewBookBoxDetails(box)}
-                    style={{
-                      fontSize: "0.85em",
-                      padding: "5px 10px",
-                      backgroundColor: "#2196F3",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "4px"
-                    }}
-                  >
-                    🗺️ Voir sur la carte
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Book Box Details Modal */}
-      {showBookBoxDetails && selectedBookBox && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.7)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: "white",
-            padding: "20px",
-            borderRadius: "8px",
-            maxWidth: "500px",
-            width: "90%",
-            maxHeight: "80vh",
-            overflow: "auto"
-          }}>
-            <h3 style={{ marginTop: 0 }}>{selectedBookBox.name}</h3>
-            <p><strong>Description:</strong> {selectedBookBox.description}</p>
-            <p><strong>Adresse:</strong> {selectedBookBox.address}</p>
-            <p><strong>Coordonnées:</strong> {selectedBookBox.latitude}, {selectedBookBox.longitude}</p>
-
-            <div style={{ marginTop: "15px" }}>
-              <h4>Voir sur la carte:</h4>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
-                <a
-                  href={getMapUrl(selectedBookBox)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-block",
-                    padding: "8px 12px",
-                    backgroundColor: "#4285F4",
-                    color: "white",
-                    textDecoration: "none",
-                    borderRadius: "4px"
-                  }}>
-                  Google Maps
-                </a>
-                <a
-                  href={getOsmUrl(selectedBookBox)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: "inline-block",
-                    padding: "8px 12px",
-                    backgroundColor: "#0066cc",
-                    color: "white",
-                    textDecoration: "none",
-                    borderRadius: "4px"
-                  }}>
-                  OpenStreetMap
-                </a>
-                <button
-                  onClick={closeBookBoxDetails}
-                  style={{
-                    display: "inline-block",
-                    padding: "8px 12px",
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Fermer
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!pendingAction ? (
-        <div>
-          <button
-            onClick={() => handlePrepareInteraction("pris")}
-            style={{ marginRight: "10px" }}
-            disabled={!selectedBookBox}
-          >
-            📖 Pris
+          <textarea
+            className="glass-input"
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder="Écris ton commentaire ici..."
+            rows={4}
+            style={{ marginBottom: 8 }}
+          />
+          <button type="submit" style={{ alignSelf: "flex-end", marginBottom: 0 }}>
+            Ajouter un commentaire
           </button>
-          <button
-            onClick={() => handlePrepareInteraction("déposé")}
-            disabled={!selectedBookBox}
-          >
-            📚 Déposé
-          </button>
-        </div>
-      ) : (
-        <div style={{
-          marginTop: "15px",
-          padding: "15px",
-          backgroundColor: "#f8f9fa",
-          borderRadius: "5px",
-          border: "1px solid #dee2e6"
-        }}>
-          <p>
-            <strong>Confirmer l'action :</strong> {pendingAction === "pris" ? "Prendre" : "Déposer"} le livre à {selectedBookBox.address}
-          </p>
-          <button
-            onClick={handleConfirmInteraction}
-            style={{ marginRight: "10px" }}
-          >
-            ✅ Confirmer
-          </button>
-          <button
-            onClick={() => setPendingAction(null)}
-          >
-            ❌ Annuler
-          </button>
-        </div>
-      )}
-      <h2>Historique</h2>
-      {book.history.length === 0 ? (
-        <p>Aucune interaction.</p>
-      ) : (
-        <ul>
-          {book.history.map((h, i) => (
-            <li key={i}>
-              {h.date} – {h.pseudo} a {h.action} le livre à {h.location}
-            </li>
-          ))}
-        </ul>
-      )}
+        </form>
 
-      <h2>Commentaires</h2>
-      {book.comments.length > 0 && (
-        <ul style={{
-          background: "var(--glass-bg)",
-          boxShadow: "var(--glass-shadow)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
-          border: "1.5px solid var(--glass-border)",
-          color: "var(--foreground)",
-          borderRadius: "16px",
-          padding: "16px",
-          marginBottom: "20px"
-        }}>
-          {book.comments.map((c, i) => (
-            <li key={i} style={{ marginBottom: "10px" }}>
-              <strong>{c.pseudo}</strong> ({c.date}) : {c.message}
-            </li>
-          ))}
-        </ul>
-      )}
 
-      <h2>Laisser un commentaire</h2>
-      <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="Écris ton commentaire ici..."
-        style={{ width: "100%", height: "100px", marginBottom: "10px" }}
-      ></textarea>
-      <button
-        onClick={handleAddComment}
-        style={{ padding: "10px 20px", backgroundColor: "#007BFF", color: "white", border: "none", borderRadius: "4px" }}
-      >
-        Ajouter un commentaire
-      </button>
-      <button>Mon bouton</button>
-
-      {/* Pour les modals et blocs d'information */}
-      <div
-        style={{
-          background: "var(--glass-bg)",
-          boxShadow: "var(--glass-shadow)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
-          border: "1.5px solid var(--glass-border)",
-          color: "var(--foreground)",
-          borderRadius: "16px",
-          padding: "20px",
-          marginBottom: "20px"
-        }}
-      >
-        {/* contenu */}
       </div>
     </div>
   )

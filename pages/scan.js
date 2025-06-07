@@ -52,26 +52,7 @@ export default function ScanPage({ initialUser }) {
 
         {/* Popup HTML */}
         {showPopup && (
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              background: "var(--glass-bg)",
-              boxShadow: "var(--glass-shadow)",
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-              border: "1.5px solid var(--glass-border)",
-              color: "var(--foreground)",
-              padding: "24px 32px",
-              zIndex: 1000,
-              borderRadius: "16px",
-              textAlign: "center",
-              minWidth: "280px",
-              maxWidth: "90vw",
-            }}
-          >
+          <div className="glass-modal">
             <h2 style={{ marginBottom: 16 }}>Information</h2>
             {user ? (
               <p>
