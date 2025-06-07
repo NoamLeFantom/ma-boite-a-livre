@@ -46,60 +46,96 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="p-4">
+    <div>
       <Header />
-      <div class="GlobalPage">
-        <h1 className="text-xl font-bold mb-2">🔎 Rechercher un livre</h1>
-
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Ex : isbn-0002 ou Candide"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="border p-2 rounded mr-2"
-          />
-          <button
-            onClick={handleSearch}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            {loading ? "Recherche..." : "Rechercher"}
-          </button>
-        </div>
-
-        {exactMatch && (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold">📘 Livre exact trouvé</h2>
-            <Link href={`/book/${exactMatch.id}`}>
-              <div className="border p-2 rounded mt-2 cursor-pointer">
-                <strong>{exactMatch.title}</strong> — ID : {exactMatch.id}
-              </div>
-            </Link>
+      <div className="GlobalPage">
+        <div
+          style={{
+            maxWidth: 600,
+            margin: "0 auto",
+            background: "var(--glass-bg)",
+            boxShadow: "var(--glass-shadow)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            border: "1.5px solid var(--glass-border)",
+            borderRadius: "18px",
+            padding: "32px 24px",
+            marginTop: "40px"
+          }}
+        >
+          <h1 style={{ fontWeight: "bold", marginBottom: 20 }}>🔎 Rechercher un livre</h1>
+          <div style={{ marginBottom: 24, display: "flex", gap: 8 }}>
+            <input
+              type="text"
+              placeholder="Ex : isbn-0002 ou Candide"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{
+                flex: 1,
+                border: "1px solid var(--glass-border)",
+                borderRadius: 8,
+                padding: "10px 12px",
+                fontSize: "1rem",
+                background: "rgba(255,255,255,0.5)",
+                color: "var(--foreground)"
+              }}
+            />
+            <button onClick={handleSearch}>
+              {loading ? "Recherche..." : "Rechercher"}
+            </button>
           </div>
-        )}
 
-        <div>
-          <h2 className="text-lg font-semibold">
-            📚 {exactMatch ? "Autres exemplaires du même livre" : "Résultats"}
-          </h2>
-
-          {isbnMatches.length === 0 && query && !loading && (
-            <p className="text-gray-500">Aucun résultat trouvé.</p>
+          {exactMatch && (
+            <div style={{
+              background: "var(--glass-hover-bg)",
+              border: "1.5px solid var(--primary)",
+              borderRadius: 12,
+              padding: 16,
+              marginBottom: 24
+            }}>
+              <h2 style={{ fontWeight: 600 }}>📘 Livre exact trouvé</h2>
+              <Link href={`/book/${exactMatch.id}`}>
+                <div style={{ cursor: "pointer", marginTop: 8 }}>
+                  <strong>{exactMatch.title}</strong> — ID : {exactMatch.id}
+                </div>
+              </Link>
+            </div>
           )}
 
-          <ul className="mt-2 space-y-2">
-            {isbnMatches.map((book) => (
-              <li key={book.id} className="border p-2 rounded">
-                <Link href={`/book/${book.id}`}>
-                  <strong>{book.title}</strong> — ID : {book.id}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div>
+            <h2 style={{ fontWeight: 600 }}>
+              📚 {exactMatch ? "Autres exemplaires du même livre" : "Résultats"}
+            </h2>
 
-        <div className="mt-6">
-          <a href="/scan" className="text-blue-600 underline">📷 Scanner un QR Code</a>
+            {isbnMatches.length === 0 && query && !loading && (
+              <p style={{ color: "#888", marginTop: 8 }}>Aucun résultat trouvé.</p>
+            )}
+
+            <ul style={{ marginTop: 12, listStyle: "none", padding: 0 }}>
+              {isbnMatches.map((book) => (
+                <li
+                  key={book.id}
+                  style={{
+                    background: "var(--glass-bg)",
+                    border: "1px solid var(--glass-border)",
+                    borderRadius: 10,
+                    marginBottom: 10,
+                    padding: "10px 14px"
+                  }}
+                >
+                  <Link href={`/book/${book.id}`}>
+                    <strong>{book.title}</strong> — ID : {book.id}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div style={{ marginTop: 32 }}>
+            <Link href="/scan" style={{ color: "var(--primary)", textDecoration: "underline" }}>
+              📷 Scanner un QR Code
+            </Link>
+          </div>
         </div>
       </div>
     </div>

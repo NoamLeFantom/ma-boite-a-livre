@@ -50,13 +50,9 @@ export default function ProfilePage() {
   };
 
   const handleLogout = () => {
-    // Afficher une popup de confirmation
     const confirmLogout = window.confirm("Êtes-vous sûr de vouloir vous déconnecter ?");
     if (confirmLogout) {
-      // Supprimer le cookie d'authentification
       cookie.remove("user");
-
-      // Rediriger vers la page de connexion
       router.push("/");
     }
   };
@@ -65,37 +61,68 @@ export default function ProfilePage() {
   if (!user) return <div><Header/><p>Vous devez être connecté pour voir cette page.</p></div>;
 
   return (
-    <div style={{ padding: 0 }}>
+    <div>
       <Header />
-      <div class="GlobalPage">
-      <h1>Mon Profil</h1>
-      {success && <p style={{ color: "green" }}>{success}</p>}
-      <label>
-        Nom:
-        <input
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
-      </label>
-      <br />
-      <label>
-        Email:
-        <input
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-      </label>
-      <br />
-      <button onClick={handleUpdate}>Mettre à jour</button>
-      <br /><br />
-      <button onClick={handleDelete} style={{ color: "red" }}>
-        Supprimer mon compte
-      </button>
-      {/* Ajout du bouton de déconnexion */}
-      <button onClick={handleLogout} style={{ marginTop: 20 }}>
-        Déconnexion
-      </button>
-    </div>
+      <div className="GlobalPage">
+        <div
+          style={{
+            maxWidth: 500,
+            margin: "40px auto",
+            background: "var(--glass-bg)",
+            boxShadow: "var(--glass-shadow)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            border: "1.5px solid var(--glass-border)",
+            borderRadius: "18px",
+            padding: "32px 24px"
+          }}
+        >
+          <h1 style={{ marginBottom: 24 }}>Mon Profil</h1>
+          {success && <p style={{ color: "green" }}>{success}</p>}
+          <label style={{ marginBottom: 8 }}>
+            Nom :
+            <input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              style={{
+                border: "1px solid var(--glass-border)",
+                borderRadius: 8,
+                padding: "10px 12px",
+                fontSize: "1rem",
+                background: "rgba(255,255,255,0.5)",
+                color: "var(--foreground)",
+                marginLeft: 8
+              }}
+            />
+          </label>
+          <br />
+          <label style={{ marginBottom: 8 }}>
+            Email :
+            <input
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              style={{
+                border: "1px solid var(--glass-border)",
+                borderRadius: 8,
+                padding: "10px 12px",
+                fontSize: "1rem",
+                background: "rgba(255,255,255,0.5)",
+                color: "var(--foreground)",
+                marginLeft: 8
+              }}
+            />
+          </label>
+          <br />
+          <button onClick={handleUpdate}>Mettre à jour</button>
+          <br /><br />
+          <button onClick={handleDelete} style={{ color: "red" }}>
+            Supprimer mon compte
+          </button>
+          <button onClick={handleLogout} style={{ marginTop: 20 }}>
+            Déconnexion
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

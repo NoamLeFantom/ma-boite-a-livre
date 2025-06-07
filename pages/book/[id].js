@@ -535,12 +535,20 @@ export default function BookPage({ book, initialUser }) {
       )}
 
       <h2>Commentaires</h2>
-      <br />
-
       {book.comments.length > 0 && (
-        <ul>
+        <ul style={{
+          background: "var(--glass-bg)",
+          boxShadow: "var(--glass-shadow)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          border: "1.5px solid var(--glass-border)",
+          color: "var(--foreground)",
+          borderRadius: "16px",
+          padding: "16px",
+          marginBottom: "20px"
+        }}>
           {book.comments.map((c, i) => (
-            <li key={i}>
+            <li key={i} style={{ marginBottom: "10px" }}>
               <strong>{c.pseudo}</strong> ({c.date}) : {c.message}
             </li>
           ))}
@@ -560,6 +568,24 @@ export default function BookPage({ book, initialUser }) {
       >
         Ajouter un commentaire
       </button>
+      <button>Mon bouton</button>
+
+      {/* Pour les modals et blocs d'information */}
+      <div
+        style={{
+          background: "var(--glass-bg)",
+          boxShadow: "var(--glass-shadow)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          border: "1.5px solid var(--glass-border)",
+          color: "var(--foreground)",
+          borderRadius: "16px",
+          padding: "20px",
+          marginBottom: "20px"
+        }}
+      >
+        {/* contenu */}
+      </div>
     </div>
   )
 };

@@ -32,9 +32,8 @@ export default function SignupPage() {
         alert("Pseudo déjà pris");
         return;
       }
-      setCurrentUser(user); // Automatically log in the user after signup
+      setCurrentUser(user);
 
-      // Send validation email
       await fetch("/api/send-validation-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,46 +48,77 @@ export default function SignupPage() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div>
       <Header />
-      <h1>Créer un compte</h1>
-      <form onSubmit={handleSignup}>
-        <div>
-          <label htmlFor="username">Nom d'utilisateur :</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
+      <div className="GlobalPage">
+        <div
+          style={{
+            maxWidth: 400,
+            margin: "40px auto",
+            background: "var(--glass-bg)",
+            boxShadow: "var(--glass-shadow)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            border: "1.5px solid var(--glass-border)",
+            borderRadius: "18px",
+            padding: "32px 24px"
+          }}
+        >
+          <h1 style={{ marginBottom: 24 }}>Créer un compte</h1>
+          <form onSubmit={handleSignup} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <input
+              type="text"
+              placeholder="Nom d'utilisateur"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              style={{
+                border: "1px solid var(--glass-border)",
+                borderRadius: 8,
+                padding: "10px 12px",
+                fontSize: "1rem",
+                background: "rgba(255,255,255,0.5)",
+                color: "var(--foreground)"
+              }}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{
+                border: "1px solid var(--glass-border)",
+                borderRadius: 8,
+                padding: "10px 12px",
+                fontSize: "1rem",
+                background: "rgba(255,255,255,0.5)",
+                color: "var(--foreground)"
+              }}
+            />
+            <input
+              type="password"
+              placeholder="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={{
+                border: "1px solid var(--glass-border)",
+                borderRadius: 8,
+                padding: "10px 12px",
+                fontSize: "1rem",
+                background: "rgba(255,255,255,0.5)",
+                color: "var(--foreground)"
+              }}
+            />
+            {error && <p style={{ color: "red", margin: 0 }}>{error}</p>}
+            <button type="submit">S'inscrire</button>
+          </form>
+          <p style={{ marginTop: 16 }}>
+            Déjà inscrit ? <a href="/login" style={{ color: "var(--primary)" }}>Se connecter</a>
+          </p>
         </div>
-        <div>
-          <label htmlFor="email">Email :</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Mot de passe :</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit">S'inscrire</button>
-      </form>
-      <p>
-        Déjà inscrit ? <a href="/login">Se connecter</a>
-      </p>
+      </div>
     </div>
   );
 }

@@ -58,15 +58,21 @@ export default function ScanPage({ initialUser }) {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "white",
-              padding: "20px",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              background: "var(--glass-bg)",
+              boxShadow: "var(--glass-shadow)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+              border: "1.5px solid var(--glass-border)",
+              color: "var(--foreground)",
+              padding: "24px 32px",
               zIndex: 1000,
-              borderRadius: "8px",
+              borderRadius: "16px",
               textAlign: "center",
+              minWidth: "280px",
+              maxWidth: "90vw",
             }}
           >
-            <h2>Information</h2>
+            <h2 style={{ marginBottom: 16 }}>Information</h2>
             {user ? (
               <p>
                 Vous êtes connecté en tant que <strong>{user.username}</strong>.
@@ -76,32 +82,19 @@ export default function ScanPage({ initialUser }) {
                 Vous n'êtes pas connecté. Certaines fonctionnalités pourraient ne pas être disponibles.
               </p>
             )}
-            <div style={{ marginTop: "15px" }}>
+            <div
+              style={{
+                marginTop: "20px",
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+              }}
+            >
               {!user && (
-                <button
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#0070f3",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    marginRight: "10px",
-                  }}
-                  onClick={() => router.push("/login")}
-                >
-                  Se connecter
-                </button>
+                <button onClick={() => router.push("/login")}>Se connecter</button>
               )}
               <button
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "gray",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
+                style={{ backgroundColor: "gray" }}
                 onClick={() => setShowPopup(false)}
               >
                 Fermer
