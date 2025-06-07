@@ -6,6 +6,9 @@ import { useState, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 import axios from "axios";
 
+import Link from "next/link";
+import Image from "next/image";
+
 export async function getServerSideProps(context) {
   const { id } = context.params;
   const book = await getBookById(id);
@@ -43,6 +46,7 @@ export default function BookPage({ book, initialUser }) {
     }
   }, [initialUser]);
 
+
   const [location, setLocation] = useState("");
   const [comment, setComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +62,62 @@ export default function BookPage({ book, initialUser }) {
     fetchBookBoxes().then(setNearbyBookBoxes).catch(console.error);
   }, []);
 
+  useEffect(() => {
+    async function fetchInteractions() {
+      try {
+        const response = await fetch("/api/books", {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch books");
+        }
+        const data = await response.json();
+        setBooks(data); // car tu récupères les livres ici
+      } catch (error) {
+        console.error("Error fetching interactions:", error);
+      }
+    }
+
+    fetchInteractions();
+  }, []);
+
+  useEffect(() => {
+    const fetchBookImages = async () => {
+      const images = {};
+
+      await Promise.all(
+        books.map(async (book) => {
+          if (!book.isbn || typeof book.isbn !== "string") return;
+
+          try {
+            const response = await fetch(
+              `https://www.googleapis.com/books/v1/volumes?q=isbn:${book.isbn}`
+            );
+            const data = await response.json();
+            const thumbnail =
+              data.items?.[0]?.volumeInfo?.imageLinks?.thumbnail || null;
+
+            images[book.isbn] = thumbnail;
+          } catch (error) {
+            console.error(
+              `Erreur lors de la récupération de l'image pour ISBN ${book.isbn}:`,
+              error
+            );
+            images[book.isbn] = null;
+          }
+        })
+      );
+
+      setBookImages(images);
+    };
+
+    if (books.length > 0) {
+      fetchBookImages();
+    }
+  }, [books]);
+
+  const deg2rad = useCallback((deg) => deg * (Math.PI / 180), []);
+
   const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
     const R = 6371; // Radius of the earth in km
     const dLat = deg2rad(lat2 - lat1);
@@ -68,9 +128,7 @@ export default function BookPage({ book, initialUser }) {
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance in km
-  }, []);
-
-  const deg2rad = useCallback((deg) => deg * (Math.PI / 180), []);
+  }, [deg2rad]);
 
   const fetchAddressFromCoordinates = async (latitude, longitude) => {
     try {
@@ -299,60 +357,6 @@ export default function BookPage({ book, initialUser }) {
 
   if (!book) return <p>Livre introuvable.</p>;
 
-  useEffect(() => {
-    async function fetchInteractions() {
-      try {
-        const response = await fetch("/api/books", {
-          credentials: 'include',
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch books");
-        }
-        const data = await response.json();
-        setBooks(data); // car tu récupères les livres ici
-      } catch (error) {
-        console.error("Error fetching interactions:", error);
-      }
-    }
-
-    fetchInteractions();
-  }, []);
-
-  useEffect(() => {
-    const fetchBookImages = async () => {
-      const images = {};
-
-      await Promise.all(
-        books.map(async (book) => {
-          if (!book.isbn || typeof book.isbn !== "string") return;
-
-          try {
-            const response = await fetch(
-              `https://www.googleapis.com/books/v1/volumes?q=isbn:${book.isbn}`
-            );
-            const data = await response.json();
-            const thumbnail =
-              data.items?.[0]?.volumeInfo?.imageLinks?.thumbnail || null;
-
-            images[book.isbn] = thumbnail;
-          } catch (error) {
-            console.error(
-              `Erreur lors de la récupération de l'image pour ISBN ${book.isbn}:`,
-              error
-            );
-            images[book.isbn] = null;
-          }
-        })
-      );
-
-      setBookImages(images);
-    };
-
-    if (books.length > 0) {
-      fetchBookImages();
-    }
-  }, [books]);
-
   return (
     <div>
       <Header />
@@ -361,11 +365,13 @@ export default function BookPage({ book, initialUser }) {
         <p><strong>Auteur:</strong> {book.author}</p>
         <p><strong>ISBN:</strong> {book.isbn}</p>
         <p><strong>Unique ID:</strong> {book.id}</p>
-        <img
-  className="commentaire_img"
-  src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
-  alt={`Couverture de ${book.title}`}
-/>
+        <Image
+          className="commentaire_img"
+          src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
+          alt={`Couverture de ${book.title}`}
+          width={150}
+          height={200}
+        />
 
         <h2>Actions</h2>
         <div style={{ marginBottom: "10px" }}>
@@ -485,7 +491,7 @@ export default function BookPage({ book, initialUser }) {
               <div style={{ marginTop: "15px" }}>
                 <h4>Voir sur la carte:</h4>
                 <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
-                  <a
+                  <Link
                     href={getMapUrl(selectedBookBox)}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -498,8 +504,8 @@ export default function BookPage({ book, initialUser }) {
                       borderRadius: "4px"
                     }}>
                     Google Maps
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href={getOsmUrl(selectedBookBox)}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -512,7 +518,7 @@ export default function BookPage({ book, initialUser }) {
                       borderRadius: "4px"
                     }}>
                     OpenStreetMap
-                  </a>
+                  </Link>
                   <button
                     onClick={closeBookBoxDetails}
                     style={{
