@@ -86,74 +86,89 @@ export default function Home({ initialUser }) {
       <Header />
       <div className="GlobalPage">
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <h1 style={{ marginBottom: "20px" }}>Bienvenue sur Books Travellers</h1>
+          <h1 style={{ marginBottom: "20px", fontSize: "larger" }}>Bienvenue sur Books <strong style={{ color: "#0070f3" }}>Travellers</strong></h1>
+          <p style={{ marginBottom: "20px", textAlign: "center", fontSize: "1rem" }}>
+            Une nouvelle histoire s'écrit !<br />
+            Déjà <strong style={{ color: "#0070f3" }}>{books.length}</strong> livres qui voyagent !<br />
+            Commence dès maintenant !
+          </p>
+          <Link href="/scan"><button>Scaner le QR code du livre</button></Link>
           {user ? (
             <>
               <p style={{ marginBottom: "20px" }}>Heureux de te voir <strong style={{ color: "#0070f3" }}>{user.username}</strong></p>
             </>
           ) : (
             <>
-              <Link style={{marginBottom:"20px"}} href="/signup"><button>Rejoindre l'aventure</button></Link>
+              <Link href="/signup"><button>Rejoindre l'aventure</button></Link>
             </>
           )}
-          <p style={{textAlign:"left"}}>
-            L'application qui permet d'écrire la nouvelle histoire des livres en quelques cliques ! <br/> Récupére ou dépose un livre en scanant le QR code !
-            <Link href="/scan"><button>Scaner le livre</button></Link>
 
-        </p>
         </div>
-        <h2>📚 Livres les plus commentés</h2>
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <h2 style={{marginBottom:"15px"}}>Livres le plus commentés </h2>
+        <ul className="containerBookCard">
           {[...books]
             .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
             .slice(0, 1) // top 5
             .map((book, index) => (
-              <li key={index} style={{ display: "flex", alignItems: "center", marginBottom: "15px" }}>
-                <img
-                  src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
-                  alt={`Couverture de ${book.title}`}
-                  style={{
-                    width: "50px",
-                    height: "75px",
-                    objectFit: "cover",
-                    marginRight: "10px",
-                  }}
-                />
-                <div>
-                  <Link href={`/book/view/${book.id}`}>
-                    <strong>{book.title}</strong>
-                  </Link>{" "}
-                  — {book.comments?.length || 0} commentaire(s)
+              <li key={index} className="bookCard">
+                <Link style={{marginBottom:"10px"}} href={`/book/view/${book.id}`}><strong>{book.title}</strong></Link>
+
+                <div className="bookCardDesc">
+                  <img className="commentaire_img"
+                    src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
+                    alt={`Couverture de ${book.title}`}
+                  />
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                  <p style={{marginBottom:"10px"}}>{book.comments?.length || 0} commentaire(s)</p>
+                  {book.comments.length > 0 && (
+                    <div>
+                      {(() => {
+                        const lastComment = book.comments[book.comments.length - 1];
+                        const truncate = (text, maxLength) =>
+                          text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+
+                        return (
+                          <div>
+                            <p style={{marginBottom:"5px"}}>
+                              Commentaire le plus récent :</p>
+                              <p>
+                              <strong>{lastComment.pseudo}</strong><br/><span className="commentaire">{truncate(lastComment.message, 30)}</span><br/>
+                              <span className="commentaire_data" style={{fontSize:"10px"}}>{lastComment.date}</span>
+                            </p>
+                            <Link href={`/book/view/${book.id}`}>
+                              Voir le livre
+                            </Link>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
                 </div>
               </li>
             ))}
+
         </ul>
 
-        
 
-        <h2>📖 Dernières interactions</h2>
-        <ul style={{ listStyle: "none", padding: 0 }}>
+
+        <h2 style={{marginBottom:"20px"}}>📖 Dernières interactions</h2>
+        <ul className="containerBookCard">
           {interactions.map((entry, index) => {
             const lastInteraction = entry.history?.length
               ? [...entry.history].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
               : null;
 
             return (
-              <li key={index} style={{ display: "flex", alignItems: "center", marginBottom: "15px" }}>
+              <li key={index} className="bookCard">
                 <img
+                  className="commentaire_img"
                   src={
                     bookImages[entry.isbn]
                       ? bookImages[entry.isbn]
                       : "/images/BooksTravellers.png"
                   }
                   alt={`Couverture de ${entry.title}`}
-                  style={{
-                    width: "50px",
-                    height: "75px",
-                    objectFit: "cover",
-                    marginRight: "10px",
-                    backgroundColor: "#eee",
-                  }}
                 />
                 <div>
                   <Link href={`/book/view/${entry.id}`}>

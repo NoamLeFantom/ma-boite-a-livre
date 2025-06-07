@@ -1,11 +1,11 @@
 :root {
-  --background: #ffffff;
-  --foreground: #030303;
+  --background: #ededed;
+  --foreground: #2e2e2e;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #2e2e2e;
     --foreground: #ededed;
   }
 }
@@ -21,8 +21,8 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
-  color: #333;
+  background-color: #ededed;
+  color: #2e2e2e;
 }
 
 body {
@@ -34,14 +34,17 @@ body {
 }
 
 .GlobalPage {
+  margin-top: 70px;
   padding: 20px;
   position: relative;
 }
 
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-size: larger;
-  color: #444;
+  color: var(--foreground);
 }
 
 button {
@@ -52,6 +55,7 @@ button {
   padding: 10px 15px;
   cursor: pointer;
   font-size: 1rem;
+  margin-bottom: 20px;
 }
 
 button:hover {
@@ -90,4 +94,49 @@ hr {
   html {
     color-scheme: dark;
   }
+}
+
+.containerBookCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 40px;
+  list-style: none;
+}
+
+.bookCard {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  background-color: salmon;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.bookCard:hover {
+  background-color: #ff7f7f;
+}
+
+.bookCardDesc {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.commentaire {
+  font-style: italic;
+}
+
+.commentaire_img {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.commentaire_data {
+  font-size: 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
 }
