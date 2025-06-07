@@ -104,7 +104,7 @@ export default function Home({ initialUser }) {
           )}
 
         </div>
-        <h2 style={{marginBottom:"15px"}}>Livres le plus commentés </h2>
+        <h2 style={{marginBottom:"15px"}}>Livres le plus commentés :</h2>
         <ul className="containerBookCard">
           {[...books]
             .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))

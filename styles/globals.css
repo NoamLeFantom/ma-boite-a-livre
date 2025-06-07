@@ -1,12 +1,24 @@
 :root {
   --background: #ededed;
   --foreground: #2e2e2e;
+  --primary: #0070f3;
+  --primary-dark: #005bb5;
+  --glass-bg: rgba(255, 255, 255, 0.18);
+  --glass-border: rgba(255, 255, 255, 0.28);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --glass-hover-bg: rgba(127, 172, 255, 0.35);
+  --glass-hover-shadow: 0 8px 32px 0 rgba(127, 172, 255, 0.35);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #2e2e2e;
     --foreground: #ededed;
+    --glass-bg: rgba(30, 30, 30, 0.35);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+    --glass-hover-bg: rgba(60, 90, 150, 0.35);
+    --glass-hover-shadow: 0 8px 32px 0 rgba(60, 90, 150, 0.35);
   }
 }
 
@@ -14,18 +26,6 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-}
-
-/* Uniform styling for all pages */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #ededed;
-  color: #2e2e2e;
-}
-
-body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
@@ -39,27 +39,31 @@ body {
   position: relative;
 }
 
-
 h1,
 h2,
 h3 {
   font-size: larger;
   color: var(--foreground);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
 }
 
 button {
-  background-color: #0070f3;
+  background-color: var(--primary);
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 10px 15px;
+  border-radius: 8px;
+  padding: 10px 20px;
   cursor: pointer;
   font-size: 1rem;
   margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
 }
 
 button:hover {
-  background-color: #005bb5;
+  background-color: var(--primary-dark);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 
 * {
@@ -69,8 +73,14 @@ button:hover {
 }
 
 a {
-  color: #0070f3;
+  color: var(--primary);
   text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
 }
 
 hr {
@@ -80,7 +90,6 @@ hr {
   margin: 20px 0;
 }
 
-/* Specific styling for messages */
 .message {
   padding: 15px;
   background-color: #e7f3fe;
@@ -94,6 +103,11 @@ hr {
   html {
     color-scheme: dark;
   }
+  .message {
+    background-color: #1a2332;
+    border-color: #2a3b5c;
+    color: #8bb4f8;
+  }
 }
 
 .containerBookCard {
@@ -102,41 +116,61 @@ hr {
   width: 100%;
   margin-bottom: 40px;
   list-style: none;
+  gap: 20px;
 }
 
 .bookCard {
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
-  background-color: salmon;
-  padding: 10px;
-  border-radius: 4px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid var(--glass-border);
+  transition: box-shadow 0.3s, background 0.3s, border 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 
 .bookCard:hover {
-  background-color: #ff7f7f;
+  background: var(--glass-hover-bg);
+  box-shadow: var(--glass-hover-shadow);
+  border-color: var(--primary);
 }
 
 .bookCardDesc {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  margin-top: 10px;
+  color: var(--foreground);
 }
 
 .commentaire {
   font-style: italic;
+  color: #444;
+  margin-bottom: 8px;
+  opacity: 0.85;
 }
 
 .commentaire_img {
-  width: auto;
-  height: 100%;
+  width: 100%;
+  max-height: 180px;
   object-fit: cover;
   margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
 .commentaire_data {
-  font-size: 10px;
+  font-size: 12px;
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
+  color: #888;
+  opacity: 0.8;
+  margin-top: 5px;
 }

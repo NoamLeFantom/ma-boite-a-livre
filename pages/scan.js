@@ -3,21 +3,28 @@ import { useRouter } from "next/router";
 import Header from "@/components/Header";
 import styles from "@/styles/Home.module.css";
 import { useState, useEffect } from "react";
+import { getCurrentUser } from "@/lib/session";
 
-export default function ScanPage() {
+export async function getServerSideProps(context) {
+  const user = getCurrentUser(context.req);
+  return {
+    props: {
+      initialUser: user || null,
+    },
+  };
+}
+
+export default function ScanPage({ initialUser }) {
   const router = useRouter();
-  const [user, setUser] = useState(null); // Simule l'utilisateur connecté
-  const [showPopup, setShowPopup] = useState(false); // Gère l'affichage de la popup
+  const [user, setUser] = useState(initialUser);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    // Simule une vérification de l'utilisateur connecté
-    const loggedInUser = null; // Remplacez par votre logique d'authentification
-    setUser(loggedInUser);
-
-    if (!loggedInUser) {
-      setShowPopup(true); // Affiche la popup si l'utilisateur n'est pas connecté
+    if (!initialUser) {
+      setUser(getCurrentUser());
     }
-  }, []);
+    setShowPopup(true); // Affiche la popup à chaque arrivée sur la page
+  }, [initialUser]);
 
   const handleScan = (data) => {
     try {
@@ -65,7 +72,9 @@ export default function ScanPage() {
                 Vous êtes connecté en tant que <strong>{user.username}</strong>.
               </p>
             ) : (
-              <p>Vous n'êtes pas connecté. Certaines fonctionnalités pourraient ne pas être disponibles.</p>
+              <p>
+                Vous n'êtes pas connecté. Certaines fonctionnalités pourraient ne pas être disponibles.
+              </p>
             )}
             <div style={{ marginTop: "15px" }}>
               {!user && (
@@ -79,7 +88,7 @@ export default function ScanPage() {
                     cursor: "pointer",
                     marginRight: "10px",
                   }}
-                  onClick={() => router.push("/login")} // Redirige vers la page de connexion
+                  onClick={() => router.push("/login")}
                 >
                   Se connecter
                 </button>
@@ -93,7 +102,7 @@ export default function ScanPage() {
                   borderRadius: "4px",
                   cursor: "pointer",
                 }}
-                onClick={() => setShowPopup(false)} // Ferme la popup
+                onClick={() => setShowPopup(false)}
               >
                 Fermer
               </button>
