@@ -365,13 +365,17 @@ export default function BookPage({ book, initialUser }) {
         <p><strong>Auteur:</strong> {book.author}</p>
         <p><strong>ISBN:</strong> {book.isbn}</p>
         <p><strong>Unique ID:</strong> {book.id}</p>
-        <Image
-          className="commentaire_img"
-          src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
-          alt={`Couverture de ${book.title}`}
-          width={150}
-          height={200}
-        />
+        <div className="bookPage">
+                  <Image
+                  className=""
+                  style={{width:"100%", height:"auto",maxWidth:"280px"}}
+                  src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
+                  alt={`Couverture de ${book.title}`}
+                  width={150}
+                  height={200}
+                />
+          <p>{book.description}</p>
+        </div>
 
         <h2>Actions</h2>
         <div style={{ marginBottom: "10px" }}>
@@ -599,13 +603,13 @@ export default function BookPage({ book, initialUser }) {
         )}
 
         <h2>Commentaires</h2>
-        <div className="glass-block" style={{ padding: 0, marginBottom: 24 }}>
+        <div className="history-block" style={{ padding: 0, marginBottom: 24 }}>
           {book.comments.length === 0 ? (
             <p style={{ padding: "16px", color: "#888" }}>Aucun commentaire pour ce livre.</p>
           ) : (
             <ul className="comment-list">
               {book.comments.map((c, i) => (
-                <li className="comment-item" key={i}>
+                <li className="history-item" key={i}>
                   <div style={{ fontWeight: 600, color: "var(--primary)" }}>{c.pseudo}</div>
                   <div style={{ fontSize: "0.95em", opacity: 0.7, marginBottom: 4 }}>{c.date}</div>
                   <div style={{ fontSize: "1.05em" }}>{c.message}</div>
@@ -621,16 +625,16 @@ export default function BookPage({ book, initialUser }) {
             e.preventDefault();
             handleAddComment();
           }}
-          className="glass-block"
-          style={{ padding: "20px", marginBottom: 32, display: "flex", flexDirection: "column", gap: 12, maxWidth: 600 }}
+          className="history-block"
+          style={{display: "flex", flexDirection: "column"}}
         >
           <textarea
-            className="glass-input"
+            className="bookCard"
             value={comment}
             onChange={e => setComment(e.target.value)}
             placeholder="Écris ton commentaire ici..."
             rows={4}
-            style={{ marginBottom: 8 }}
+            style={{ marginBottom: 8, width: "-webkit-fill-available" }}
           />
           <button type="submit" style={{ alignSelf: "flex-end", marginBottom: 0 }}>
             Ajouter un commentaire

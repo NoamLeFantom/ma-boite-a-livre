@@ -6,6 +6,9 @@ import { useState, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 import axios from "axios";
 
+import Link from "next/link";
+import Image from "next/image";
+
 export async function getServerSideProps(context) {
   const { id } = context.params;
   const book = await getBookById(id);
@@ -34,117 +37,72 @@ export default function BookPage({ book, initialUser }) {
   const [user, setUser] = useState(initialUser);
   const pseudo = user?.username || "inconnu";
 
+  const [books, setBooks] = useState([]);
+  const [bookImages, setBookImages] = useState({});
+
   useEffect(() => {
     if (!initialUser) {
       setUser(getCurrentUser());
     }
   }, [initialUser]);
 
-  const [location, setLocation] = useState("");
+
   const [comment, setComment] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [nearbyBookBoxes, setNearbyBookBoxes] = useState([]);
-  const [userCoords, setUserCoords] = useState(null);
-  const [showBookBoxes, setShowBookBoxes] = useState(false);
-  const [pendingAction, setPendingAction] = useState(null);
-  const [selectedBookBox, setSelectedBookBox] = useState(null);
-  const [showBookBoxDetails, setShowBookBoxDetails] = useState(false);
-  const [suggestedCities, setSuggestedCities] = useState([]);
+
 
   useEffect(() => {
-    fetchBookBoxes().then(setNearbyBookBoxes).catch(console.error);
+    async function fetchInteractions() {
+      try {
+        const response = await fetch("/api/books", {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch books");
+        }
+        const data = await response.json();
+        setBooks(data); // car tu récupères les livres ici
+      } catch (error) {
+        console.error("Error fetching interactions:", error);
+      }
+    }
+
+    fetchInteractions();
   }, []);
 
-  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of the earth in km
-    const dLat = deg2rad(lat2 - lat1);
-    const dLon = deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
-  }, []);
+  useEffect(() => {
+    const fetchBookImages = async () => {
+      const images = {};
 
-  const deg2rad = useCallback((deg) => deg * (Math.PI / 180), []);
+      await Promise.all(
+        books.map(async (book) => {
+          if (!book.isbn || typeof book.isbn !== "string") return;
 
-  const getNearbyBookBoxes = useCallback((latitude, longitude) => {
-    const bookBoxesWithDistance = BOOK_BOXES.map(box => {
-      const distance = calculateDistance(latitude, longitude, box.latitude, box.longitude);
-      return { ...box, distance };
-    });
+          try {
+            const response = await fetch(
+              `https://www.googleapis.com/books/v1/volumes?q=isbn:${book.isbn}`
+            );
+            const data = await response.json();
+            const thumbnail =
+              data.items?.[0]?.volumeInfo?.imageLinks?.thumbnail || null;
 
-    return bookBoxesWithDistance.sort((a, b) => a.distance - b.distance);
-  }, [calculateDistance]);
+            images[book.isbn] = thumbnail;
+          } catch (error) {
+            console.error(
+              `Erreur lors de la récupération de l'image pour ISBN ${book.isbn}:`,
+              error
+            );
+            images[book.isbn] = null;
+          }
+        })
+      );
 
-  const fetchAddressFromCoordinates = async (latitude, longitude) => {
-    try {
-      const response = await axios.get("https://api-adresse.data.gouv.fr/reverse/", {
-        params: {
-          lat: latitude,
-          lon: longitude,
-        },
-      });
+      setBookImages(images);
+    };
 
-      const features = response.data?.features;
-      if (features && features.length > 0) {
-        return features[0].properties.label;
-      }
-
-      return "Adresse non disponible";
-    } catch (error) {
-      console.error("Erreur lors de la récupération de l'adresse :", error);
-      return "Erreur lors de la récupération de l'adresse";
+    if (books.length > 0) {
+      fetchBookImages();
     }
-  };
-
-  const enhanceBookBoxWithAddress = async (bookBox) => {
-    if (!bookBox.latitude || !bookBox.longitude) return bookBox;
-
-    const address = await fetchAddressFromCoordinates(bookBox.latitude, bookBox.longitude);
-    return { ...bookBox, address };
-  };
-
-  const handlePrepareInteraction = useCallback((action) => {
-    if (!selectedBookBox) {
-      alert("Veuillez sélectionner une boîte à livres.");
-      return;
-    }
-    setPendingAction(action);
-  }, [selectedBookBox]);
-
-  const handleConfirmInteraction = useCallback(async () => {
-    console.log("Pseudo sent for interaction:", pseudo);
-    if (!pendingAction || !selectedBookBox) return;
-
-    try {
-      const response = await fetch("/api/interaction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include',
-        body: JSON.stringify({
-          id: book.id,
-          action: pendingAction,
-          location: selectedBookBox.address,
-          pseudo,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to confirm interaction");
-      }
-
-      setLocation("");
-      setPendingAction(null);
-      setSelectedBookBox(null);
-      router.replace(router.asPath);
-    } catch (error) {
-      console.error("Error confirming interaction:", error);
-      alert("Une erreur s'est produite lors de la confirmation de l'interaction.");
-    }
-  }, [pendingAction, selectedBookBox, book.id, pseudo, router]);
+  }, [books]);
 
   const handleAddComment = useCallback(async () => {
     console.log("Pseudo sent for comment:", pseudo);
@@ -178,168 +136,88 @@ export default function BookPage({ book, initialUser }) {
     }
   }, [comment, book.id, pseudo, router]);
 
-  const handleGetLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      alert("La géolocalisation n'est pas supportée par votre navigateur.");
-      return;
-    }
-
-    setIsLoading(true);
-
-    navigator.permissions.query({ name: 'geolocation' }).then((permissionStatus) => {
-      if (permissionStatus.state === 'denied') {
-        alert("La géolocalisation est désactivée. Veuillez l'activer dans les paramètres de votre navigateur.");
-        setIsLoading(false);
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async ({ coords: { latitude, longitude } }) => {
-          setUserCoords({ latitude, longitude });
-          setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-
-          try {
-            const nearby = await fetchBookBoxes(latitude, longitude);
-            const enhancedNearby = await Promise.all(nearby.map(enhanceBookBoxWithAddress));
-            setNearbyBookBoxes(enhancedNearby);
-            setShowBookBoxes(true);
-          } catch (error) {
-            console.error("Erreur lors de la récupération des boîtes à livres :", error);
-            alert("Une erreur s'est produite lors de la récupération des boîtes à livres.");
-          } finally {
-            setIsLoading(false);
-          }
-        },
-        (error) => {
-          setIsLoading(false);
-          alert("Erreur de géolocalisation : " + error.message);
-        }
-      );
-    });
-  }, []);
-
-  const selectBookBox = useCallback((bookBox) => {
-    setLocation(bookBox.address);
-    setSelectedBookBox(bookBox);
-    setShowBookBoxes(false);
-  }, []);
-
-  const viewBookBoxDetails = useCallback((bookBox) => {
-    setSelectedBookBox(bookBox);
-    setShowBookBoxDetails(true);
-  }, []);
-
-  const closeBookBoxDetails = useCallback(() => {
-    setShowBookBoxDetails(false);
-    setSelectedBookBox(null);
-  }, []);
-
-  const getMapUrl = useCallback((bookBox) => {
-    return `https://www.google.com/maps/search/?api=1&query=${bookBox.latitude},${bookBox.longitude}`;
-  }, []);
-
-  const getOsmUrl = useCallback((bookBox) => {
-    return `https://www.openstreetmap.org/?mlat=${bookBox.latitude}&mlon=${bookBox.longitude}#map=18/${bookBox.latitude}/${bookBox.longitude}`;
-  }, []);
-
-  const searchBookBoxes = async () => {
-    if (!location.trim()) {
-      alert("Veuillez entrer un lieu pour rechercher des boîtes à livres.");
-      return;
-    }
-
-    try {
-      const coords = await geocodeCity(location);
-      if (!coords) {
-        alert("Aucun résultat trouvé pour la ville spécifiée.");
-        return;
-      }
-
-      const { latitude, longitude } = coords;
-      const bookBoxes = await fetchBookBoxes(latitude, longitude);
-      const enhancedBookBoxes = await Promise.all(bookBoxes.map(enhanceBookBoxWithAddress));
-      setNearbyBookBoxes(enhancedBookBoxes);
-      setShowBookBoxes(true);
-    } catch (error) {
-      console.error("Error searching book boxes:", error);
-      alert("Une erreur s'est produite lors de la recherche des boîtes à livres.");
-    }
-  };
-
-  const handleSearchChange = async (e) => {
-    const query = e.target.value;
-    setLocation(query);
-
-    if (query.trim().length < 3) {
-      setSuggestedCities([]);
-      return;
-    }
-
-    try {
-      const response = await axios.get("https://api-adresse.data.gouv.fr/search/", {
-        params: {
-          q: query,
-          limit: 5,
-        },
-      });
-
-      const features = response.data?.features || [];
-      const cities = features.map((feature) => ({
-        name: feature.properties.name,
-        city: feature.properties.city,
-        latitude: feature.geometry.coordinates[1],
-        longitude: feature.geometry.coordinates[0],
-      }));
-
-      setSuggestedCities(cities);
-    } catch (error) {
-      console.error("Erreur lors de la recherche des villes :", error);
-      setSuggestedCities([]);
-    }
-  };
-
-  const handleCitySelect = (city) => {
-    setLocation(`${city.name}, ${city.city}`);
-    setSuggestedCities([]);
-  };
 
   if (!book) return <p>Livre introuvable.</p>;
 
   return (
-    <div style={{ padding: 0 }}>
+    <div>
       <Header />
       <div className="GlobalPage">
-      <h1>{book.title}</h1>
-      <p><strong>Auteur:</strong> {book.author}</p>
-      <p><strong>ISBN:</strong> {book.isbn}</p>
-      <p><strong>Unique ID:</strong> {book.id}</p>
+        <h1>{book.title}</h1>
+        <p><strong>Auteur:</strong> {book.author}</p>
+        <p><strong>ISBN:</strong> {book.isbn}</p>
+        <p><strong>Unique ID:</strong> {book.id}</p>
+        <div className="bookPage">
+          <Image
+          className=""
+          style={{width:"100%", height:"auto",maxWidth:"280px"}}
+          src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
+          alt={`Couverture de ${book.title}`}
+          width={150}
+          height={200}
+        />
+        <p>{book.description}</p>
+        </div>
+        <h2>Historique</h2>
+        {book.history.length === 0 ? (
+          <div className="history-block" style={{ color: "#888" }}>
+            Aucune interaction.
+          </div>
+        ) : (
+          <ul className="history-block">
+            {book.history.map((h, i) => (
+              <li className="history-item" key={i}>
+                <span style={{ fontWeight: 600, color: "var(--primary)" }}>{h.pseudo}</span>
+                <span style={{ fontSize: "0.95em", opacity: 0.7 }}>{h.date}</span>
+                <span style={{ fontSize: "1.05em" }}>
+                  a {h.action} le livre à <span style={{ fontWeight: 500 }}>{h.location}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <h2>Historique</h2>
-      {book.history.length === 0 ? (
-        <p>Aucune interaction.</p>
-      ) : (
-        <ul>
-          {book.history.map((h, i) => (
-            <li key={i}>
-              {h.date} – {h.pseudo} a {h.action} le livre à {h.location}
-            </li>
-          ))}
-        </ul>
-      )}
+        <h2>Commentaires</h2>
+        <div className="history-block" style={{ padding: 0, marginBottom: 24 }}>
+          {book.comments.length === 0 ? (
+            <p style={{ padding: "16px", color: "#888" }}>Aucun commentaire pour ce livre.</p>
+          ) : (
+            <ul className="comment-list">
+              {book.comments.map((c, i) => (
+                <li className="history-item" key={i}>
+                  <div style={{ fontWeight: 600, color: "var(--primary)" }}>{c.pseudo}</div>
+                  <div style={{ fontSize: "0.95em", opacity: 0.7, marginBottom: 4 }}>{c.date}</div>
+                  <div style={{ fontSize: "1.05em" }}>{c.message}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-      <h2>Commentaires</h2>
-      <br />
+        <h2>Laisser un commentaire</h2>
+        <form
+          onSubmit={e => {
+            e.preventDefault();
+            handleAddComment();
+          }}
+          className="history-block"
+          style={{display: "flex", flexDirection: "column"}}
+        >
+          <textarea
+            className="bookCard"
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder="Écris ton commentaire ici..."
+            rows={4}
+            style={{ marginBottom: 8, width:"-webkit-fill-available"}}
+          />
+          <button type="submit" style={{ alignSelf: "flex-end", marginBottom: 0 }}>
+            Ajouter un commentaire
+          </button>
+        </form>
 
-      {book.comments.length > 0 && (
-        <ul>
-          {book.comments.map((c, i) => (
-            <li key={i}>
-              <strong>{c.pseudo}</strong> ({c.date}) : {c.message}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+
+      </div>
     </div>
   )
 };

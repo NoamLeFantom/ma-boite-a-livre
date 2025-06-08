@@ -104,46 +104,46 @@ export default function Home({ initialUser }) {
           )}
 
         </div>
-        <h2 style={{marginBottom:"15px"}}>Livres le plus commentés :</h2>
+        <h2 style={{ marginBottom: "15px" }}>Livres le plus commentés :</h2>
         <ul className="containerBookCard">
           {[...books]
             .sort((a, b) => (b.comments?.length || 0) - (a.comments?.length || 0))
             .slice(0, 1) // top 5
             .map((book, index) => (
               <li key={index} className="bookCard">
-                <Link style={{marginBottom:"10px"}} href={`/book/view/${book.id}`}><strong>{book.title}</strong></Link>
+                <Link style={{ marginBottom: "10px" }} href={`/book/view/${book.id}`}><strong>{book.title}</strong></Link>
 
                 <div className="bookCardDesc">
                   <img className="commentaire_img"
                     src={bookImages[book.isbn] || "/images/BooksTravellers.png"}
                     alt={`Couverture de ${book.title}`}
                   />
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                  <p style={{marginBottom:"10px"}}>{book.comments?.length || 0} commentaire(s)</p>
-                  {book.comments.length > 0 && (
-                    <div>
-                      {(() => {
-                        const lastComment = book.comments[book.comments.length - 1];
-                        const truncate = (text, maxLength) =>
-                          text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+                  <div cl style={{ display: "flex", flexDirection: "column" }}>
+                    <p style={{ marginBottom: "10px" }}>{book.comments?.length || 0} commentaire(s)</p>
+                    {book.comments.length > 0 && (
+                      <div>
+                        {(() => {
+                          const lastComment = book.comments[book.comments.length - 1];
+                          const truncate = (text, maxLength) =>
+                            text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 
-                        return (
-                          <div>
-                            <p style={{marginBottom:"5px"}}>
-                              Commentaire le plus récent :</p>
-                              <p>
-                              <strong>{lastComment.pseudo}</strong><br/><span className="commentaire">{truncate(lastComment.message, 30)}</span><br/>
-                              <span className="commentaire_data" style={{fontSize:"10px"}}>{lastComment.date}</span>
-                            </p>
-                            <Link href={`/book/view/${book.id}`}>
-                              Voir le livre
+                          return (
+                            <div style={{display:"flex", flexDirection: "column"}}>
+                              <div className="history-item">
+                              <p>Dernier commentaire :</p>
+                              <p style={{ fontWeight: 600, color: "var(--primary)" }}>{lastComment.pseudo}</p>
+                              <p style={{ fontSize: "0.95em", opacity: 0.7, marginBottom: 4 }}>{lastComment.date}</p>
+                              <p style={{ fontSize: "1.05em" }}>{truncate(lastComment.message, 30)}</p>
+                            </div>
+                            <Link style={{alignSelf: "self-end"}} href={`/book/view/${book.id}`}>
+                                Voir le livre
                             </Link>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  )}
-                </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </li>
             ))}
@@ -152,7 +152,7 @@ export default function Home({ initialUser }) {
 
 
 
-        <h2 style={{marginBottom:"20px"}}>📖 Dernières interactions</h2>
+        <h2 style={{ marginBottom: "20px" }}>Dernières interactions</h2>
         <ul className="containerBookCard">
           {interactions.map((entry, index) => {
             const lastInteraction = entry.history?.length
@@ -161,6 +161,10 @@ export default function Home({ initialUser }) {
 
             return (
               <li key={index} className="bookCard">
+                <Link style={{ marginBottom: "10px" }} href={`/book/view/${entry.id}`}>
+                    <strong>{entry.title}</strong>
+                </Link>
+                <div className="bookCardDesc">
                 <img
                   className="commentaire_img"
                   src={
@@ -171,9 +175,7 @@ export default function Home({ initialUser }) {
                   alt={`Couverture de ${entry.title}`}
                 />
                 <div>
-                  <Link href={`/book/view/${entry.id}`}>
-                    <strong>{entry.title}</strong>
-                  </Link>
+                  
                   <p>{entry.isbn}</p>
                   {lastInteraction ? (
                     <>
@@ -183,6 +185,9 @@ export default function Home({ initialUser }) {
                   ) : (
                     "— Aucune interaction"
                   )}
+
+
+                </div>
                 </div>
               </li>
             );

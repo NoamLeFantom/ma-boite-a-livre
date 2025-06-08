@@ -65,17 +65,7 @@ export default function ProfilePage() {
       <Header />
       <div className="GlobalPage">
         <div
-          style={{
-            maxWidth: 500,
-            margin: "40px auto",
-            background: "var(--glass-bg)",
-            boxShadow: "var(--glass-shadow)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-            border: "1.5px solid var(--glass-border)",
-            borderRadius: "18px",
-            padding: "32px 24px"
-          }}
+          className="glass-modal"
         >
           <h1 style={{ marginBottom: 24 }}>Mon Profil</h1>
           {success && <p style={{ color: "green" }}>{success}</p>}
@@ -84,15 +74,7 @@ export default function ProfilePage() {
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              style={{
-                border: "1px solid var(--glass-border)",
-                borderRadius: 8,
-                padding: "10px 12px",
-                fontSize: "1rem",
-                background: "rgba(255,255,255,0.5)",
-                color: "var(--foreground)",
-                marginLeft: 8
-              }}
+              className="glass-input"
             />
           </label>
           <br />
@@ -101,24 +83,16 @@ export default function ProfilePage() {
             <input
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              style={{
-                border: "1px solid var(--glass-border)",
-                borderRadius: 8,
-                padding: "10px 12px",
-                fontSize: "1rem",
-                background: "rgba(255,255,255,0.5)",
-                color: "var(--foreground)",
-                marginLeft: 8
-              }}
+              className="glass-input"
             />
           </label>
           <br />
-          <button onClick={handleUpdate}>Mettre à jour</button>
+          <button onClick={handleUpdate}className="glass-input">Mettre à jour</button>
           <br /><br />
-          <button onClick={handleDelete} style={{ color: "red" }}>
+          <button onClick={handleDelete} className="glass-input" style={{ color: "red" }}>
             Supprimer mon compte
           </button>
-          <button onClick={handleLogout} style={{ marginTop: 20 }}>
+          <button onClick={handleLogout} className="glass-input" style={{ marginTop: 20 }}>
             Déconnexion
           </button>
         </div>

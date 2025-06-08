@@ -64,23 +64,15 @@ export default function SearchPage() {
           }}
         >
           <h1 style={{ fontWeight: "bold", marginBottom: 20 }}>🔎 Rechercher un livre</h1>
-          <div style={{ marginBottom: 24, display: "flex", gap: 8 }}>
+          <div className="containerBookCard">
             <input
               type="text"
               placeholder="Ex : isbn-0002 ou Candide"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              style={{
-                flex: 1,
-                border: "1px solid var(--glass-border)",
-                borderRadius: 8,
-                padding: "10px 12px",
-                fontSize: "1rem",
-                background: "rgba(255,255,255,0.5)",
-                color: "var(--foreground)"
-              }}
+              className="glass-input"
             />
-            <button onClick={handleSearch}>
+            <button onClick={handleSearch} style={{}} className="glass-input">
               {loading ? "Recherche..." : "Rechercher"}
             </button>
           </div>

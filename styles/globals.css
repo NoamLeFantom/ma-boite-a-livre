@@ -16,7 +16,7 @@
     --foreground: #ededed;
     --glass-bg: rgba(30, 30, 30, 0.35);
     --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-shadow: 0 8px 32px 0 rgba(0,0,0,0.25);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
     --glass-hover-bg: rgba(60, 90, 150, 0.35);
     --glass-hover-shadow: 0 8px 32px 0 rgba(60, 90, 150, 0.35);
   }
@@ -57,13 +57,13 @@ button {
   cursor: pointer;
   font-size: 1rem;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: background 0.2s, box-shadow 0.2s;
 }
 
 button:hover {
   background-color: var(--primary-dark);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 * {
@@ -103,6 +103,7 @@ hr {
   html {
     color-scheme: dark;
   }
+
   .message {
     background-color: #1a2332;
     border-color: #2a3b5c;
@@ -162,7 +163,7 @@ hr {
   object-fit: cover;
   margin-bottom: 10px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
 }
 
 .commentaire_data {
@@ -173,6 +174,13 @@ hr {
   color: #888;
   opacity: 0.8;
   margin-top: 5px;
+}
+
+@media (min-width: 768px) {
+  .containerBookCard {
+    flex-direction: row;
+  }
+
 }
 
 .glass-modal {
@@ -192,6 +200,12 @@ hr {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 1000;
+
+
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  align-items: center;
 }
 
 .glass-input {
@@ -199,8 +213,9 @@ hr {
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 1rem;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.5);
   color: var(--foreground);
+  height: fit-content;
 }
 
 .history-block {
@@ -219,10 +234,11 @@ hr {
 .history-item {
   margin-bottom: 14px;
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid rgb(0 112 243 / 21%);
   display: flex;
   flex-direction: column;
 }
+
 .history-item:last-child {
   border-bottom: none;
 }
@@ -238,6 +254,22 @@ hr {
   padding-bottom: 12px;
   border-bottom: 1px solid var(--glass-border);
 }
+
 .comment-item:last-child {
   border-bottom: none;
+}
+
+.bookPage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  margin-top: 24px;
+}
+
+@media (min-width: 768px) {
+  .bookPage {
+    display: flex;
+    flex-direction: row;
+  }
 }

@@ -43,6 +43,8 @@
     transform: scale(1.03);
   }
   z-index: 1002;
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 .logo {
   height: 40px;
@@ -142,6 +144,8 @@
   @media (max-width: 768px) {
     display: flex;
   }
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .burgerLine {
