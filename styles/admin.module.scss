@@ -1,0 +1,56 @@
+.adminContainer {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+}
+
+.bookList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bookItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8f8f8;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px #0001;
+  flex-wrap: wrap;
+}
+
+.bookInfo {
+  flex: 2;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 120px;
+  justify-content: flex-end;
+}
+
+.qrCode {
+  margin-top: 1rem;
+  width: 128px;
+}
+
+@media (max-width: 600px) {
+  .bookItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

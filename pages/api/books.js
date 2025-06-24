@@ -61,16 +61,29 @@ export default async function handler(req, res) {
       const result = await db.collection("BookData").deleteOne({ _id: new ObjectId(id) });
 
       if (result.deletedCount === 0) {
-        return res.status(404).json({ error: "Book not found" });
+        return res.status(404).json({ error: "Livre non trouvé" });
       }
 
-      res.status(200).json({ message: "Book deleted successfully" });
+      res.status(200).json({ message: "Livre supprimé" });
     } catch (error) {
       console.error("Error deleting book:", error);
       res.status(500).json({ error: "Failed to delete book" });
     }
+  } else if (req.method === "PUT") {
+    const { id } = req.query;
+    const { title, author, isbn, literaryMovement } = req.body;
+    if (!id) return res.status(400).json({ error: "Missing book ID" });
+    try {
+      await db.collection("BookData").updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { title, author, isbn, literaryMovement } }
+      );
+      res.status(200).json({ message: "Livre mis à jour" });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la mise à jour" });
+    }
   } else {
-    res.setHeader("Allow", ["GET", "POST", "DELETE"]);
+    res.setHeader("Allow", ["GET", "POST", "DELETE", "PUT"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

@@ -426,10 +426,7 @@ export default function BookPage({ book, initialUser }) {
                   borderRadius: "4px",
                   backgroundColor: selectedBookBox?.id === box.id ? "#d1e7dd" : "#f9f9f9"
                 }}>
-                  <strong>{box.name}</strong>
-                  {box.distance && <span> - {box.distance.toFixed(2)} km</span>}
-                  <p style={{ margin: "5px 0", fontSize: "0.9em" }}>{box.description}</p>
-                  <p style={{ margin: "5px 0", fontSize: "0.9em", color: "#555" }}>{box.address}</p>
+                  <strong>{box.address}</strong>
                   <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
                     <button
                       onClick={() => selectBookBox(box)}
