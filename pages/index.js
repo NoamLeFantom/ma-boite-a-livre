@@ -96,7 +96,7 @@ export default function Home({ initialUser }) {
 
           
           <p>Une enquête est en cours, répondez au questionnaire</p>
-          <Link href="https://sphinx-campus.com/tiny/a/gcgqy3y9"><button>Répondre au questionnaire</button></Link>
+          <Link href="https://sphinx-campus.com/tiny/a/gcgqy3y9" passHref target="_blank" rel="noopener noreferrer"><button>Répondre au questionnaire</button></Link>
         </div>
         <h2 style={{ marginBottom: "15px" }}>Livres le plus commentés :</h2>
         <ul className="containerBookCard">
