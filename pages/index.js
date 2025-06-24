@@ -2,6 +2,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/session";
 import Header from "@/components/Header";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
+
 
 export async function getServerSideProps(context) {
   const user = getCurrentUser(context.req);
@@ -85,24 +88,15 @@ export default function Home({ initialUser }) {
     <div style={{ padding: 0 }}>
       <Header />
       <div className="GlobalPage">
-        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+        <div style={{ textAlign: "center", marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <h1 style={{ marginBottom: "20px", fontSize: "larger" }}>Bienvenue sur Books <strong style={{ color: "#0070f3" }}>Travellers</strong></h1>
-          <p style={{ marginBottom: "20px", textAlign: "center", fontSize: "1rem" }}>
-            Une nouvelle histoire s'écrit !<br />
-            Déjà <strong style={{ color: "#0070f3" }}>{books.length}</strong> livres qui voyagent !<br />
-            Commence dès maintenant !
-          </p>
-          <Link href="/scan"><button>Scaner le QR code du livre</button></Link>
-          {user ? (
-            <>
-              <p style={{ marginBottom: "20px" }}>Heureux de te voir <strong style={{ color: "#0070f3" }}>{user.username}</strong></p>
-            </>
-          ) : (
-            <>
-              <Link href="/signup"><button>Rejoindre l'aventure</button></Link>
-            </>
-          )}
+          <p style={{ marginBottom: "10px", textAlign: "center", fontSize: "1rem" }}>
+            Une nouvelle histoire s'écrit !</p>
+            <div style={{display:"flex", flexDirection:"row", justifyContent:"center", alignItems:"center",maxWidth:"280px", gap:"15px"}}><span style={{fontSize:"5rem"}}><strong style={{ color: "#0070f3" }}>{books.length}</strong></span><span style={{fontSize:"xx-large", textAlign:"left"}}>livres qui voyagent déjà !</span></div>
 
+          
+          <p>Une enquête est en cours, répondez au questionnaire</p>
+          <Link href="https://sphinx-campus.com/tiny/a/gcgqy3y9"><button>Répondre au questionnaire</button></Link>
         </div>
         <h2 style={{ marginBottom: "15px" }}>Livres le plus commentés :</h2>
         <ul className="containerBookCard">
@@ -128,29 +122,40 @@ export default function Home({ initialUser }) {
                             text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 
                           return (
-                            <div style={{display:"flex", flexDirection: "column"}}>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
                               <div className="history-item">
-                              <p>Dernier commentaire :</p>
-                              <p style={{ fontWeight: 600, color: "var(--primary)" }}>{lastComment.pseudo}</p>
-                              <p style={{ fontSize: "0.95em", opacity: 0.7, marginBottom: 4 }}>{lastComment.date}</p>
-                              <p style={{ fontSize: "1.05em" }}>{truncate(lastComment.message, 30)}</p>
-                            </div>
-                            <Link style={{alignSelf: "self-end"}} href={`/book/view/${book.id}`}>
+                                <p>Dernier commentaire :</p>
+                                <p style={{ fontWeight: 600, color: "var(--primary)" }}>{lastComment.pseudo}</p>
+                                <p style={{ fontSize: "0.95em", opacity: 0.7, marginBottom: 4 }}>{lastComment.date}</p>
+                                <p style={{ fontSize: "1.05em" }}>{truncate(lastComment.message, 30)}</p>
+                              </div>
+                              <Link style={{ alignSelf: "self-end" }} href={`/book/view/${book.id}`}>
                                 Voir le livre
-                            </Link>
+                              </Link>
                             </div>
                           );
                         })()}
                       </div>
                     )}
                   </div>
+                  
                 </div>
               </li>
             ))}
 
         </ul>
 
-
+<Link href="/scan"><button>Scaner le QR code du livre</button></Link>
+          {user ? (
+            <>
+              <p style={{ marginBottom: "20px" }}>Heureux de te voir <strong style={{ color: "#0070f3" }}>{user.username}</strong></p>
+            </>
+          ) : (
+            <>
+              Commence dès maintenant !
+              <Link href="/signup"><button>Rejoindre l'aventure</button></Link>
+            </>
+          )}
 
         <h2 style={{ marginBottom: "20px" }}>Dernières interactions</h2>
         <ul className="containerBookCard">
@@ -162,32 +167,32 @@ export default function Home({ initialUser }) {
             return (
               <li key={index} className="bookCard">
                 <Link style={{ marginBottom: "10px" }} href={`/book/view/${entry.id}`}>
-                    <strong>{entry.title}</strong>
+                  <strong>{entry.title}</strong>
                 </Link>
                 <div className="bookCardDesc">
-                <img
-                  className="commentaire_img"
-                  src={
-                    bookImages[entry.isbn]
-                      ? bookImages[entry.isbn]
-                      : "/images/BooksTravellers.png"
-                  }
-                  alt={`Couverture de ${entry.title}`}
-                />
-                <div>
-                  
-                  <p>{entry.isbn}</p>
-                  {lastInteraction ? (
-                    <>
-                      — par <em>{lastInteraction.pseudo}</em> le{" "}
-                      {new Date(lastInteraction.date).toLocaleDateString()}
-                    </>
-                  ) : (
-                    "— Aucune interaction"
-                  )}
+                  <img
+                    className="commentaire_img"
+                    src={
+                      bookImages[entry.isbn]
+                        ? bookImages[entry.isbn]
+                        : "/images/BooksTravellers.png"
+                    }
+                    alt={`Couverture de ${entry.title}`}
+                  />
+                  <div>
+
+                    <p>{entry.isbn}</p>
+                    {lastInteraction ? (
+                      <>
+                        — par <em>{lastInteraction.pseudo}</em> le{" "}
+                        {new Date(lastInteraction.date).toLocaleDateString()}
+                      </>
+                    ) : (
+                      "— Aucune interaction"
+                    )}
 
 
-                </div>
+                  </div>
                 </div>
               </li>
             );
@@ -195,6 +200,8 @@ export default function Home({ initialUser }) {
 
         </ul>
       </div>
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
