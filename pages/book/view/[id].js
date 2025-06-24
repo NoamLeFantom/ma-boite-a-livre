@@ -9,6 +9,10 @@ import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
 
+
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 export async function getServerSideProps(context) {
   const { id } = context.params;
   const book = await getBookById(id);
@@ -218,6 +222,8 @@ export default function BookPage({ book, initialUser }) {
 
 
       </div>
+      <Analytics />
+      <SpeedInsights />
     </div>
   )
 };

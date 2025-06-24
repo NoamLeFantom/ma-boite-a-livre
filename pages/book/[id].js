@@ -6,6 +6,9 @@ import { useState, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 import axios from "axios";
 
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 import Link from "next/link";
 import Image from "next/image";
 
@@ -640,6 +643,8 @@ export default function BookPage({ book, initialUser }) {
 
 
       </div>
+      <Analytics />
+      <SpeedInsights />
     </div>
   )
 };

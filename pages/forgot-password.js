@@ -1,6 +1,9 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -60,6 +63,8 @@ export default function ForgotPasswordPage() {
           {message && <p style={{ marginTop: 16 }}>{message}</p>}
         </div>
       </div>
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }

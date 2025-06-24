@@ -3,6 +3,9 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 export default function ConfirmEmailPage() {
   const router = useRouter();
   const { token } = router.query;
@@ -54,6 +57,8 @@ export default function ConfirmEmailPage() {
           </Link>
         </div>
       </div>
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }

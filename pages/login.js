@@ -3,6 +3,10 @@ import { useRouter } from "next/router";
 import Header from "@/components/Header";
 import { setCurrentUser } from "@/lib/session";
 
+
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -106,6 +110,8 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
