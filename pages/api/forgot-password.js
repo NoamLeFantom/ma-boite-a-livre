@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     );
 
     // Construire le lien de réinitialisation
-    const resetLink = `${process.env.BASE_URL}/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${resetToken}`;
 
     // Envoyer l'e-mail
     await sendResetPasswordEmail(email, resetToken);
