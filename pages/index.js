@@ -88,16 +88,17 @@ export default function Home({ initialUser }) {
     <div style={{ padding: 0 }}>
       <Header />
       <div className="GlobalPage">
-        <div style={{ textAlign: "center", marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <h1 style={{ marginBottom: "20px", fontSize: "larger" }}>Bienvenue sur Books <strong style={{ color: "#0070f3" }}>Travellers</strong></h1>
-          <p style={{ marginBottom: "10px", textAlign: "center", fontSize: "1rem" }}>
+        <div className="BlocContent">
+          <h1 className="BlocContentText" style={{ marginBottom: "20px", textAlign:"left"}}>Trouve le livre qui te fera <strong style={{ color: "#0070f3" }}>Voyager</strong> proche de chez toi !</h1>
+          </div>
+          <div><p style={{ marginBottom: "10px", textAlign: "center", fontSize: "1rem" }}>
             Une nouvelle histoire s'écrit !</p>
             <div style={{display:"flex", flexDirection:"row", justifyContent:"center", alignItems:"center",maxWidth:"280px", gap:"15px"}}><span style={{fontSize:"5rem"}}><strong style={{ color: "#0070f3" }}>{books.length}</strong></span><span style={{fontSize:"xx-large", textAlign:"left"}}>livres qui voyagent déjà !</span></div>
-
+</div>
           
           <p>Une enquête est en cours, répondez au questionnaire</p>
           <Link href="https://sphinx-campus.com/tiny/a/gcgqy3y9" passHref target="_blank" rel="noopener noreferrer"><button>Répondre au questionnaire</button></Link>
-        </div>
+        
         <h2 style={{ marginBottom: "15px" }}>Livres le plus commentés :</h2>
         <ul className="containerBookCard">
           {[...books]
